@@ -23,6 +23,7 @@ angular-sticky-table-header
 
 **js**
 
+```js
 angular
 .module('foo', ['angularStickyTableHeader'])
 .controller('fooCtrl', ['$scope', function ($scope) {
@@ -34,6 +35,7 @@ angular
 	];
 
 });
+```
 
 **css**
 
@@ -49,18 +51,12 @@ angular
 		left: 0;
 		right: 0;
 		top: 0;
+}
 
 [sticky-table-header] .sticky-stuck {
 	display: table;
 }
 ```
-
-### column resizing happens on:
-
-- initial load
-- window resize
-- column collection change
-- row collection change
 
 ### how it works
 
@@ -68,14 +64,23 @@ angular
 2. hide the clone
 3. set each `<th>`'s width equal to the offsetWidth of each one's source `<th>`
 4. when the user scrolls, show the cloned `<th>`s if the original `<th>`s are off-screen
-5. when the window is resized, resize the `<th>`s accordingly
+5. when the window is resized or a data collection changes, resize the `<th>`s accordingly
+
+### events that trigger column resizing
+
+- initial load
+- window resize
+- column collection change
+- row collection change
 
 ### running the demo
 
-```bash
+```shell
 sass index.scss index.css
 bower install
 ```
+
+then pop open index.html in a browser.
 
 ### todo
 
