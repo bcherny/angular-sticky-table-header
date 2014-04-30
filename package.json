@@ -1,0 +1,11 @@
+{
+  "name": "angular-sticky-table-header",
+  "version": "0.0.1",
+  "description": "Sticky headers for tables",
+  "main": "angular-sticky-table-header.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Boris Cherny <bcherny@turn.com>",
+  "license": "Apache2"
+}

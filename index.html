@@ -1,0 +1,38 @@
+<!doctype html>
+<html ng-app="demo">
+<head>
+
+	<meta charset="utf-8">
+
+	<title>angular-sticky-table-header demo</title>
+
+	<link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap.css">
+	<link rel="stylesheet" href="./index.css">
+
+</head>
+<body ng-controller="mainCtrl">
+
+	<div sticky-table-header columns="columnCollection" rows="rowCollection">
+
+		<table class="table">
+			<thead>
+				<tr>
+					<th ng-repeat="th in columnCollection">{{th}}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="tr in rowCollection">
+					<td ng-repeat="td in tr track by $index">{{td}}</td>
+				</tr>
+			</tbody>
+		</table>
+
+	</div>
+
+	<script src="./bower_components/lodash/dist/lodash.js"></script>
+	<script src="./bower_components/jquery/dist/jquery.js"></script>
+	<script src="./bower_components/angular/angular.js"></script>
+	<script src="./angular-sticky-table-header.js"></script>
+	<script src="./index.js"></script>
+</body>
+</html>
