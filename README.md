@@ -3,7 +3,7 @@ angular-sticky-table-header
 
 ### dependencies
 
-- angular 1.2.x
+- angular 1.0.8
 - jquery 1.x.x
 - lodash 2.x.x (`_.debounce`)
 

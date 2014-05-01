@@ -9,7 +9,7 @@
   "license": "Apache2",
   "dependencies": {
     "lodash": "~2.4.1",
-    "angular": "1.2.x",
+    "angular": "1.0.8",
     "jquery": "1.x.x"
   },
   "devDependencies": {
