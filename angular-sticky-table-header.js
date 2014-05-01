@@ -1,5 +1,5 @@
 angular
-.module('angularStickyTableHeader', [])
+.module('stickyTableHeader', [])
 .value('options', {
 	cloneClassName: 'sticky-clone',
 	className: 'sticky-stuck',
@@ -15,7 +15,7 @@ angular
 
 				clone: null,
 				isStuck: false,
-				topOffset: 0,
+				offset: {},
 
 				removeClones: function () {
 
@@ -46,12 +46,20 @@ angular
 
 				}),
 
-				setTopOffset: function () {
+				setCloneGutter: guard(function () {
 
-					scope.topOffset = element
+					scope.clone.css({
+						left: scope.offset.left,
+						right: scope.offset.right
+					});
+
+				}),
+
+				setOffset: function () {
+
+					scope.offset = element
 						.find('tr')[0]
-						.getBoundingClientRect()
-						.top;
+						.getBoundingClientRect();
 
 				},
 
@@ -71,8 +79,9 @@ angular
 
 				sizeClone: guard(function () {
 
-					scope.setTopOffset();
+					scope.setOffset();
 					scope.setClonedCellWidths();
+					scope.setCloneGutter();
 
 				}),
 
@@ -80,9 +89,9 @@ angular
 
 					var scroll = $window.scrollY;
 
-					if (!scope.isStuck && scroll >= scope.topOffset) {
+					if (!scope.isStuck && scroll >= scope.offset.top) {
 						scope.setStuck(true);
-					} else if (scope.isStuck && scroll < scope.topOffset) {
+					} else if (scope.isStuck && scroll < scope.offset.top) {
 						scope.setStuck(false);
 					}
 
@@ -110,6 +119,9 @@ angular
 
 			// fired when stuck state changes
 			scope.$watch('isStuck', scope.toggleClone);
+
+			// fired when the offset is re-measured
+			scope.$watch('offset.left', scope.sizeClone);
 
 			// listen on window resize event
 			angular.element($window).on({

@@ -25,7 +25,7 @@ angular-sticky-table-header
 
 ```js
 angular
-.module('foo', ['angularStickyTableHeader'])
+.module('foo', ['stickyTableHeader'])
 .controller('fooCtrl', ['$scope', function ($scope) {
 	
 	$scope.columnCollection = ['column1', 'column2', ...];
