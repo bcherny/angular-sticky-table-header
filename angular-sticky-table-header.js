@@ -5,18 +5,17 @@ angular
 	className: 'sticky-stuck',
 	interval: 10
 })
-.directive('stickyTableHeader', function ($interval, $timeout, $window, options) {
+.directive('stickyTableHeader', function ($timeout, $window, options) {
 
 	return {
 		restrict: 'A',
 		link: function (scope, element, attrs) {
 
-			var clearStuckWatch, interval, topOffset;
-
 			angular.extend(scope, {
 
 				clone: null,
 				isStuck: false,
+				topOffset: 0,
 
 				removeClones: function () {
 
@@ -37,58 +36,52 @@ angular
 
 				},
 
-				setClonedCellWidths: function () {
-
-					if (!scope.clone) {
-						return;
-					}
+				setClonedCellWidths: guard(function () {
 
 					var thClones = scope.clone.find('th');
 
 					angular.forEach(element.find('th'), function(th, n) {
 						$(thClones[n]).css('width', $(th).css('width'));
 					});
-				},
+				}),
 
 				setTopOffset: function () {
 
-					topOffset = element.find('tr')[1].getBoundingClientRect().top;
+					scope.topOffset = element
+						.find('tr')[0]
+						.getBoundingClientRect()
+						.top;
 
 				},
 
 				setStuck: function (bool) {
 
-					scope.isStuck = !!bool;
+					scope.$apply(function(){
+						scope.isStuck = !!bool;
+					});
 
 				},
 
-				toggleClone: function (bool) {
-
-					if (!scope.clone) {
-						return;
-					}
+				toggleClone: guard(function (bool) {
 
 					scope.clone[(bool ? 'add' : 'remove') + 'Class'](options.className);
-				},
 
-				sizeClone: function () {
+				}),
 
-					if (!scope.clone) {
-						return;
-					}
+				sizeClone: guard(function () {
 
 					scope.setTopOffset();
 					scope.setClonedCellWidths();
 
-				},
+				}),
 
 				checkScroll: function() {
 
 					var scroll = $window.scrollY;
 
-					if (!scope.isStuck && scroll >= topOffset) {
+					if (!scope.isStuck && scroll >= scope.topOffset) {
 						scope.setStuck(true);
-					} else if (scope.isStuck && scroll < topOffset) {
+					} else if (scope.isStuck && scroll < scope.topOffset) {
 						scope.setStuck(false);
 					}
 
@@ -104,13 +97,6 @@ angular
 				scope.removeClones();
 				scope.clone = scope.doClone();
 
-				// poll for scroll position (avoid using listeners because they will
-				// bog down the scroll event)
-				if (interval) {
-					$interval.clear(interval);
-				}
-				interval = $interval(scope.checkScroll, options.interval);
-
 			}));
 			
 			// watch rows, and re-measure column widths when they change
@@ -123,9 +109,25 @@ angular
 
 			// fired when stuck state changes
 			scope.$watch('isStuck', scope.toggleClone);
-
+			
 			// listen on window resize event
-			angular.element($window).on('resize', _.debounce(scope.setClonedCellWidths.bind(scope), options.interval));
+			angular.element($window).on({
+				resize: _.debounce(scope.setClonedCellWidths.bind(scope), options.interval),
+				scroll: _.debounce(scope.checkScroll.bind(scope), options.interval)
+			});
+
+
+			// helpers
+			
+			
+			function guard (fn) {
+				return function(){
+					if (!scope.clone) {
+						return;
+					}
+					return fn.apply(this, arguments);
+				};
+			}
 
 		}
 	};
