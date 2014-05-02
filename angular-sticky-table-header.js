@@ -2,7 +2,7 @@ angular
 .module('stickyTableHeader', [])
 .value('options', {
 	cloneClassName: 'sticky-clone',
-	className: 'sticky-stuck',
+	stuckClassName: 'sticky-stuck',
 	interval: 10
 })
 .service('util', function() {
@@ -82,7 +82,7 @@ angular
 
 				toggleClone: ifClone(function (bool) {
 
-					scope.clone[(bool ? 'add' : 'remove') + 'Class'](options.className);
+					scope.clone[(!!bool ? 'add' : 'remove') + 'Class'](options.stuckClassName);
 
 				}),
 
