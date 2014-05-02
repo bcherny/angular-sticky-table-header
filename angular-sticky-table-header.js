@@ -5,7 +5,16 @@ angular
 	className: 'sticky-stuck',
 	interval: 10
 })
-.directive('stickyTableHeader', function ($timeout, $window, options) {
+.service('util', function() {
+			
+	this.guard = function (fn, condition) {
+		return function(){
+			return condition() ? fn.apply(this, arguments) : false;
+		};
+	};
+
+})
+.directive('stickyTableHeader', function ($timeout, $window, options, util) {
 
 	return {
 		restrict: 'A',
@@ -17,6 +26,15 @@ angular
 				isStuck: false,
 				offset: {},
 
+				doClone: function () {
+
+					return $(element.find('tr')[0])
+						.clone()
+						.addClass(options.cloneClassName)
+						.appendTo(element.find('thead'));
+
+				},
+
 				removeClones: function () {
 
 					scope.isStuck = false;
@@ -27,16 +45,7 @@ angular
 
 				},
 
-				doClone: function () {
-
-					return $(element.find('tr')[0])
-						.clone()
-						.addClass(options.cloneClassName)
-						.appendTo(element.find('thead'));
-
-				},
-
-				setClonedCellWidths: guard(function () {
+				setClonedCellWidths: ifClone(function () {
 
 					var thClones = scope.clone.find('th');
 
@@ -46,7 +55,7 @@ angular
 
 				}),
 
-				setCloneGutter: guard(function () {
+				setCloneGutter: ifClone(function () {
 
 					scope.clone.css({
 						left: scope.offset.left,
@@ -71,13 +80,13 @@ angular
 
 				},
 
-				toggleClone: guard(function (bool) {
+				toggleClone: ifClone(function (bool) {
 
 					scope.clone[(bool ? 'add' : 'remove') + 'Class'](options.className);
 
 				}),
 
-				sizeClone: guard(function () {
+				sizeClone: ifClone(function () {
 
 					scope.setOffset();
 					scope.setClonedCellWidths();
@@ -85,7 +94,7 @@ angular
 
 				}),
 
-				checkScroll: guard(function() {
+				checkScroll: ifClone(function() {
 
 					var scroll = $window.scrollY;
 
@@ -100,19 +109,23 @@ angular
 			});
 			
 			// watch columns, regenerate cloned row when they change
-			scope.$watch(function(){
-				return scope[attrs.columns];
-			}, $timeout.bind(null, function(){
+			if (attrs.columns) {
+				scope.$watch(function(){
+					return scope[attrs.columns];
+				}, $timeout.bind(null, function(){
 
-				scope.removeClones();
-				scope.clone = scope.doClone();
+					scope.removeClones();
+					scope.clone = scope.doClone();
 
-			}));
+				}));
+			}
 			
 			// watch rows, and re-measure column widths when they change
-			scope.$watch(function(){
-				return scope[attrs.rows];
-			}, scope.setClonedCellWidths);
+			if (attrs.rows) {
+				scope.$watch(function(){
+					return scope[attrs.rows];
+				}, scope.setClonedCellWidths);
+			}
 
 			// fired when a clone is created
 			scope.$watch('clone', scope.sizeClone);
@@ -131,13 +144,15 @@ angular
 
 
 			// helpers
-			
-			
-			function guard (fn) {
-				return function(){
-					return scope.clone ? fn.apply(this, arguments) : false;
-				};
+
+			function ifClone (fn) {
+				return util.guard(fn, cloneExists);
 			}
+
+			function cloneExists () {
+				return scope.clone;
+			}
+			
 
 		}
 	};

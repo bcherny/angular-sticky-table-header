@@ -7,5 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Boris Cherny <bcherny@turn.com>",
-  "license": "Apache2"
+  "license": "Apache2",
+  "devDependencies": {
+    "grunt": "~0.4.4",
+    "grunt-contrib-jasmine": "~0.6.4"
+  }
 }

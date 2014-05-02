@@ -82,7 +82,15 @@ bower install
 
 then pop open index.html in a browser.
 
+### running the tests
+
+```
+bower install
+npm install
+grunt
+```
+
 ### todo
 
-- unit tests
-- layout tests
+- more unit tests
+- end to end tests
