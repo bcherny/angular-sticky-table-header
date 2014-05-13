@@ -11,6 +11,7 @@
 
 		&.sticky-stuck {
 			display: table;
+			z-index: 1000;
 		}
 	}
 }
