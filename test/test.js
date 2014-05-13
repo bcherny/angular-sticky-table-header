@@ -158,8 +158,11 @@ describe('angular-sticky-table-header', function() {
     });
   });
   return describe('#checkScroll', function() {
-    it('should call #setStuck with true when scope.isStuck is false and scrollY is >= offset.top', function() {
+    beforeEach(function() {
       spyOn(this.scope, 'setStuck');
+      return spyOn(this.scope, 'setClonedCellWidths').and.callFake(function() {});
+    });
+    it('should call #setStuck with true and #setClonedCellWidths with no arguments when scope.isStuck is false and scrollY is >= offset.top', function() {
       this.scope.clone = true;
       this.scope.isStuck = false;
       this.scope.offset = {
@@ -167,10 +170,10 @@ describe('angular-sticky-table-header', function() {
       };
       $window.scrollY = 1;
       this.scope.checkScroll();
-      return expect(this.scope.setStuck).toHaveBeenCalledWith(true);
+      expect(this.scope.setStuck).toHaveBeenCalledWith(true);
+      return expect(this.scope.setClonedCellWidths).toHaveBeenCalled();
     });
     it('should call #setStuck with false when scope.isStuck is true and scrollY is < offset.top', function() {
-      spyOn(this.scope, 'setStuck');
       this.scope.clone = true;
       this.scope.isStuck = true;
       this.scope.offset = {
@@ -181,7 +184,6 @@ describe('angular-sticky-table-header', function() {
       return expect(this.scope.setStuck).toHaveBeenCalledWith(false);
     });
     return it('should not call #setStuck otherwise', function() {
-      spyOn(this.scope, 'setStuck');
       this.scope.clone = true;
       this.scope.isStuck = true;
       this.scope.offset = {

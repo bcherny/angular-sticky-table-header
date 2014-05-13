@@ -99,6 +99,7 @@ angular
 					var scroll = $window.scrollY;
 
 					if (!scope.isStuck && scroll >= scope.offset.top) {
+						scope.setClonedCellWidths();
 						scope.setStuck(true);
 					} else if (scope.isStuck && scroll < scope.offset.top) {
 						scope.setStuck(false);
@@ -124,7 +125,7 @@ angular
 			if (attrs.rows) {
 				scope.$watch(function(){
 					return scope[attrs.rows];
-				}, scope.setClonedCellWidths);
+				}, $timeout.bind(null, scope.setClonedCellWidths));
 			}
 
 			// fired when a clone is created

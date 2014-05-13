@@ -262,9 +262,13 @@ describe 'angular-sticky-table-header', ->
 
 	describe '#checkScroll', ->
 
-		it 'should call #setStuck with true when scope.isStuck is false and scrollY is >= offset.top', ->
+		beforeEach ->
 
 			spyOn @scope, 'setStuck'
+			spyOn @scope, 'setClonedCellWidths'
+			.and.callFake ->
+
+		it 'should call #setStuck with true and #setClonedCellWidths with no arguments when scope.isStuck is false and scrollY is >= offset.top', ->
 
 			@scope.clone = true
 			@scope.isStuck = false;
@@ -277,9 +281,10 @@ describe 'angular-sticky-table-header', ->
 			expect @scope.setStuck
 			.toHaveBeenCalledWith true
 
-		it 'should call #setStuck with false when scope.isStuck is true and scrollY is < offset.top', ->
+			do expect @scope.setClonedCellWidths
+			.toHaveBeenCalled
 
-			spyOn @scope, 'setStuck'
+		it 'should call #setStuck with false when scope.isStuck is true and scrollY is < offset.top', ->
 
 			@scope.clone = true
 			@scope.isStuck = true;
@@ -293,8 +298,6 @@ describe 'angular-sticky-table-header', ->
 			.toHaveBeenCalledWith false
 
 		it 'should not call #setStuck otherwise', ->
-
-			spyOn @scope, 'setStuck'
 
 			# isStuck = true, scrollY >= offset
 			@scope.clone = true
