@@ -1,6 +1,6 @@
 {
   "name": "angular-sticky-table-header",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Sticky headers for tables",
   "main": "dist/angular-sticky-table-header.js",
   "authors": [
@@ -17,7 +17,6 @@
     "angular-mocks": "~1.2.16"
   },
   "ignore": [
-    "src",
     "test",
     "Gruntfile.coffee",
     "demo"
