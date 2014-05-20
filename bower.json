@@ -9,17 +9,17 @@
   "license": "Apache2",
   "dependencies": {
     "lodash": "^2.4",
-    "angular": "1.0.8",
-    "jquery": "^1.11"
+    "jquery": "^1.11",
+    "angular": "~1.2.16"
   },
   "devDependencies": {
     "bootstrap": "~3.1.1",
     "angular-mocks": "~1.2.16"
   },
-  "ignore": {
+  "ignore": [
     "src",
     "test",
     "Gruntfile.coffee",
     "demo"
-  }
+  ]
 }
