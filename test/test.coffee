@@ -5,17 +5,38 @@ describe 'angular-sticky-table-header', ->
 		stuckClassName: 'sticky-stuck'
 		interval: 10
 
+	window._ =
+		debounce: (fn) -> fn
+		throttle: (fn) -> fn
+
 	$window =
 		scrollY: 0
+		on: ->
+		off: ->
 
-	beforeEach (angular.mock.module 'stickyTableHeader'), ($provide) ->
+	# watchDOM =
+	# 	$watch: ->
+
+	# class MutationObserver
+
+	# 	constructor: (@fn) ->
+
+	# 	observe: (@element, @attrs) ->
+
+	# 	fire: @fn
+
+	# window.MutationObserver = MutationObserver
+
+	beforeEach (module 'stickyTableHeader'), ($provide) ->
 		
 		$provide.value 'options', options
 		$provide.value '$window', $window
+
+		null
 	
 	beforeEach ->
 		
-		inject (@$compile, $rootScope) ->
+		inject ($compile, $rootScope) =>
 
 			@scope = do $rootScope.$new
 
@@ -42,33 +63,33 @@ describe 'angular-sticky-table-header', ->
 				</div>
 			"""
 
-	beforeEach ->
+			($compile @element) @scope
+			do @scope.$digest
 
-		(@$compile @element) @scope
-		do @scope.$digest
-
-		$window =
-			scrollY: 0
+			$window =
+				scrollY: 0
+				on: ->
+				off: ->
 
 
 	#########################################
 
 
-	describe '#doClone', ->
+	describe '#createClone', ->
 
 		it 'should clone the first <tr> it finds and append it to the <thead>', ->
 
 			expect (@element.find 'thead tr').length
 			.toBe 1
 
-			do @scope.doClone
+			do @scope.createClone
 
 			expect (@element.find 'thead tr').length
 			.toBe 2
 
 		it 'should clone the <tr>\'s contents', ->
 
-			do @scope.doClone
+			do @scope.createClone
 
 			expect ($((@element.find 'thead tr')[1]).find 'th').length
 			.toBe @scope.columnCollection.length
@@ -78,24 +99,56 @@ describe 'angular-sticky-table-header', ->
 			@element.find 'thead tr'
 			.addClass 'test'
 
-			do @scope.doClone
+			do @scope.createClone
 
 			expect $((@element.find 'thead tr')[1]).hasClass 'test'
 			.toBe true
 
 		it 'should assign the clone the className defined in options.cloneClassName', ->
 
-			do @scope.doClone
+			do @scope.createClone
 
 			expect $((@element.find 'thead tr')[1]).hasClass options.cloneClassName
 			.toBe true
+
+
+	describe '#resetClone', ->
+
+		it 'should call #removeClones, #createClone, and #sizeClone', ->
+
+			spyOn @scope, 'removeClones'
+			spyOn @scope, 'createClone'
+			spyOn @scope, 'sizeClone'
+
+			do @scope.resetClone
+
+			expect @scope.removeClones
+			.toHaveBeenCalled()
+
+			expect @scope.createClone
+			.toHaveBeenCalled()
+
+			expect @scope.sizeClone
+			.toHaveBeenCalled()
+
+		it 'should set scope.clone to the value returned by #createClone', ->
+
+			@scope.clone = null
+			@scope.removeClones = ->
+			@scope.createClone = -> 42
+			@scope.sizeClone = ->
+
+			do @scope.resetClone
+
+			expect @scope.clone
+			.toBe 42
  
 
 	describe '#removeClones', ->
 
 		it 'should set scope.isStuck to false', ->
 
-			do @scope.doClone
+			do @scope.createClone
 			do @scope.removeClones
 
 			expect @scope.isStuck
@@ -103,9 +156,9 @@ describe 'angular-sticky-table-header', ->
 
 		it 'should remove all <tr> clones', ->
 
-			do @scope.doClone
-			do @scope.doClone
-			do @scope.doClone
+			do @scope.createClone
+			do @scope.createClone
+			do @scope.createClone
 
 			expect (@element.find '.' + options.cloneClassName).length
 			.toBe 3
@@ -153,7 +206,7 @@ describe 'angular-sticky-table-header', ->
 			@scope.offset = null
 
 			spyOn (@element.find 'tr')[0], 'getBoundingClientRect'
-			.and.returnValue 'foo'
+			.andReturn 'foo'
 
 			do @scope.setOffset
 
@@ -266,7 +319,7 @@ describe 'angular-sticky-table-header', ->
 
 			spyOn @scope, 'setStuck'
 			spyOn @scope, 'setClonedCellWidths'
-			.and.callFake ->
+			.andCallFake ->
 
 		it 'should call #setStuck with true and #setClonedCellWidths with no arguments when scope.isStuck is false and scrollY is >= offset.top', ->
 
@@ -318,3 +371,22 @@ describe 'angular-sticky-table-header', ->
 
 			do expect @scope.setStuck
 			.not.toHaveBeenCalled
+
+
+	describe '$destroy', ->
+
+		# TODO
+		# it 'should remove DOM events', ->
+
+		it 'should remove the mutation observer', ->
+
+			@scope.mutationObserver = ->
+
+			spyOn @scope, 'mutationObserver'
+
+			do @scope.$destroy
+
+			expect @scope.mutationObserver
+			.toHaveBeenCalled()
+
+

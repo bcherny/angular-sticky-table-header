@@ -6,63 +6,96 @@ describe('angular-sticky-table-header', function() {
     stuckClassName: 'sticky-stuck',
     interval: 10
   };
-  $window = {
-    scrollY: 0
+  window._ = {
+    debounce: function(fn) {
+      return fn;
+    },
+    throttle: function(fn) {
+      return fn;
+    }
   };
-  beforeEach(angular.mock.module('stickyTableHeader'), function($provide) {
+  $window = {
+    scrollY: 0,
+    on: function() {},
+    off: function() {}
+  };
+  beforeEach(module('stickyTableHeader'), function($provide) {
     $provide.value('options', options);
-    return $provide.value('$window', $window);
+    $provide.value('$window', $window);
+    return null;
   });
   beforeEach(function() {
-    return inject(function($compile, $rootScope) {
-      this.$compile = $compile;
-      this.scope = $rootScope.$new();
-      angular.extend(this.scope, {
-        columnCollection: ['foo', 'bar', 'baz'],
-        rowCollection: (Array.apply(null, Array(200))).map(function() {
-          return ['moo', 'woo', 'zoo'];
-        })
-      });
-      return this.element = angular.element("<div sticky-table-header columns=\"columnCollection\" rows=\"rowCollection\">\n\n	<table class=\"table\">\n		<thead>\n			<tr>\n				<th ng-repeat=\"th in columnCollection\">{{th}}</th>\n			</tr>\n		</thead>\n		<tbody>\n			<tr ng-repeat=\"tr in rowCollection\">\n				<td ng-repeat=\"td in tr\">{{td}}</td>\n			</tr>\n		</tbody>\n	</table>\n\n</div>");
-    });
+    return inject((function(_this) {
+      return function($compile, $rootScope) {
+        _this.scope = $rootScope.$new();
+        angular.extend(_this.scope, {
+          columnCollection: ['foo', 'bar', 'baz'],
+          rowCollection: (Array.apply(null, Array(200))).map(function() {
+            return ['moo', 'woo', 'zoo'];
+          })
+        });
+        _this.element = angular.element("<div sticky-table-header columns=\"columnCollection\" rows=\"rowCollection\">\n\n	<table class=\"table\">\n		<thead>\n			<tr>\n				<th ng-repeat=\"th in columnCollection\">{{th}}</th>\n			</tr>\n		</thead>\n		<tbody>\n			<tr ng-repeat=\"tr in rowCollection\">\n				<td ng-repeat=\"td in tr\">{{td}}</td>\n			</tr>\n		</tbody>\n	</table>\n\n</div>");
+        ($compile(_this.element))(_this.scope);
+        _this.scope.$digest();
+        return $window = {
+          scrollY: 0,
+          on: function() {},
+          off: function() {}
+        };
+      };
+    })(this));
   });
-  beforeEach(function() {
-    (this.$compile(this.element))(this.scope);
-    this.scope.$digest();
-    return $window = {
-      scrollY: 0
-    };
-  });
-  describe('#doClone', function() {
+  describe('#createClone', function() {
     it('should clone the first <tr> it finds and append it to the <thead>', function() {
       expect((this.element.find('thead tr')).length).toBe(1);
-      this.scope.doClone();
+      this.scope.createClone();
       return expect((this.element.find('thead tr')).length).toBe(2);
     });
     it('should clone the <tr>\'s contents', function() {
-      this.scope.doClone();
+      this.scope.createClone();
       return expect(($((this.element.find('thead tr'))[1]).find('th')).length).toBe(this.scope.columnCollection.length);
     });
     it('should mirror the original <tr>\'s className', function() {
       this.element.find('thead tr').addClass('test');
-      this.scope.doClone();
+      this.scope.createClone();
       return expect($((this.element.find('thead tr'))[1]).hasClass('test')).toBe(true);
     });
     return it('should assign the clone the className defined in options.cloneClassName', function() {
-      this.scope.doClone();
+      this.scope.createClone();
       return expect($((this.element.find('thead tr'))[1]).hasClass(options.cloneClassName)).toBe(true);
+    });
+  });
+  describe('#resetClone', function() {
+    it('should call #removeClones, #createClone, and #sizeClone', function() {
+      spyOn(this.scope, 'removeClones');
+      spyOn(this.scope, 'createClone');
+      spyOn(this.scope, 'sizeClone');
+      this.scope.resetClone();
+      expect(this.scope.removeClones).toHaveBeenCalled();
+      expect(this.scope.createClone).toHaveBeenCalled();
+      return expect(this.scope.sizeClone).toHaveBeenCalled();
+    });
+    return it('should set scope.clone to the value returned by #createClone', function() {
+      this.scope.clone = null;
+      this.scope.removeClones = function() {};
+      this.scope.createClone = function() {
+        return 42;
+      };
+      this.scope.sizeClone = function() {};
+      this.scope.resetClone();
+      return expect(this.scope.clone).toBe(42);
     });
   });
   describe('#removeClones', function() {
     it('should set scope.isStuck to false', function() {
-      this.scope.doClone();
+      this.scope.createClone();
       this.scope.removeClones();
       return expect(this.scope.isStuck).toBe(false);
     });
     return it('should remove all <tr> clones', function() {
-      this.scope.doClone();
-      this.scope.doClone();
-      this.scope.doClone();
+      this.scope.createClone();
+      this.scope.createClone();
+      this.scope.createClone();
       expect((this.element.find('.' + options.cloneClassName)).length).toBe(3);
       this.scope.removeClones();
       return expect((this.element.find('.' + options.cloneClassName)).length).toBe(0);
@@ -90,7 +123,7 @@ describe('angular-sticky-table-header', function() {
     });
     return it('should set scope.offset equal to the value returned by getBoundingClientRect', function() {
       this.scope.offset = null;
-      spyOn((this.element.find('tr'))[0], 'getBoundingClientRect').and.returnValue('foo');
+      spyOn((this.element.find('tr'))[0], 'getBoundingClientRect').andReturn('foo');
       this.scope.setOffset();
       return expect(this.scope.offset).toEqual('foo');
     });
@@ -157,10 +190,10 @@ describe('angular-sticky-table-header', function() {
       return expect(this.scope.setCloneGutter).toHaveBeenCalled();
     });
   });
-  return describe('#checkScroll', function() {
+  describe('#checkScroll', function() {
     beforeEach(function() {
       spyOn(this.scope, 'setStuck');
-      return spyOn(this.scope, 'setClonedCellWidths').and.callFake(function() {});
+      return spyOn(this.scope, 'setClonedCellWidths').andCallFake(function() {});
     });
     it('should call #setStuck with true and #setClonedCellWidths with no arguments when scope.isStuck is false and scrollY is >= offset.top', function() {
       this.scope.clone = true;
@@ -198,6 +231,14 @@ describe('angular-sticky-table-header', function() {
       $window.scrollY = 0;
       this.scope.checkScroll();
       return expect(this.scope.setStuck).not.toHaveBeenCalled();
+    });
+  });
+  return describe('$destroy', function() {
+    return it('should remove the mutation observer', function() {
+      this.scope.mutationObserver = function() {};
+      spyOn(this.scope, 'mutationObserver');
+      this.scope.$destroy();
+      return expect(this.scope.mutationObserver).toHaveBeenCalled();
     });
   });
 });

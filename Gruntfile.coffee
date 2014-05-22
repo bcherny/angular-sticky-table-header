@@ -2,6 +2,7 @@ module.exports = (grunt) ->
 
 	[
 		'grunt-contrib-coffee'
+		'grunt-contrib-concat'
 		'grunt-contrib-jasmine'
 		'grunt-contrib-sass'
 		'grunt-contrib-watch'
@@ -10,7 +11,7 @@ module.exports = (grunt) ->
 	.forEach grunt.loadNpmTasks
 
 	# task sets
-	build = ['ngmin', 'sass']
+	build = ['ngmin', 'concat', 'sass']
 	test = ['coffee', 'jasmine']
 
 	# task defs
@@ -22,6 +23,11 @@ module.exports = (grunt) ->
 			files:
 				'test/test.js': 'test/test.coffee'
 
+		concat:
+			main:
+				src: ['./bower_components/watch-dom/dist/watch-dom.js', './dist/<%= pkg.name %>.js']
+				dest: './dist/<%= pkg.name %>.js'
+
 		jasmine:
 			test:
 				src: './src/<%= pkg.name %>.js'
@@ -32,6 +38,7 @@ module.exports = (grunt) ->
 						'./bower_components/jquery/dist/jquery.js'
 						'./bower_components/angular/angular.js'
 						'./bower_components/angular-mocks/angular-mocks.js'
+						'./test/mock.js'
 					]
 					keepRunner: true
 
