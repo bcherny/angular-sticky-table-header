@@ -1,10 +1,10 @@
 {
   "name": "angular-sticky-table-header",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Sticky headers for tables",
   "main": "dist/angular-sticky-table-header.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "grunt travis --verbose"
   },
   "author": "Boris Cherny <bcherny@turn.com>",
   "license": "Apache2",
@@ -16,5 +16,13 @@
     "grunt-contrib-sass": "^0.7.3",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-ngmin": "0.0.3"
-  }
+  },
+  "keywords": [
+    "sticky",
+    "header",
+    "angular",
+    "fixed",
+    "position",
+    "stuck"
+  ],
 }
