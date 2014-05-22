@@ -14,19 +14,6 @@ describe 'angular-sticky-table-header', ->
 		on: ->
 		off: ->
 
-	# watchDOM =
-	# 	$watch: ->
-
-	# class MutationObserver
-
-	# 	constructor: (@fn) ->
-
-	# 	observe: (@element, @attrs) ->
-
-	# 	fire: @fn
-
-	# window.MutationObserver = MutationObserver
-
 	beforeEach (module 'stickyTableHeader'), ($provide) ->
 		
 		$provide.value 'options', options
@@ -93,6 +80,26 @@ describe 'angular-sticky-table-header', ->
 
 			expect ($((@element.find 'thead tr')[1]).find 'th').length
 			.toBe @scope.columnCollection.length
+
+		it 'should clone the <tr>\'s events', ->
+
+			mock =
+				fn: ->
+
+			spyOn mock, 'fn'
+
+			$ (@element.find 'thead tr')[0]
+			.find 'th'
+			.on 'click', mock.fn
+
+			clone = do @scope.createClone
+
+			$ (@element.find 'thead tr')[1]
+			.find 'th'
+			.click()
+
+			expect mock.fn
+			.toHaveBeenCalled()
 
 		it 'should mirror the original <tr>\'s className', ->
 

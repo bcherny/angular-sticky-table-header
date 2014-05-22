@@ -55,6 +55,17 @@ describe('angular-sticky-table-header', function() {
       this.scope.createClone();
       return expect(($((this.element.find('thead tr'))[1]).find('th')).length).toBe(this.scope.columnCollection.length);
     });
+    it('should clone the <tr>\'s events', function() {
+      var clone, mock;
+      mock = {
+        fn: function() {}
+      };
+      spyOn(mock, 'fn');
+      $((this.element.find('thead tr'))[0]).find('th').on('click', mock.fn);
+      clone = this.scope.createClone();
+      $((this.element.find('thead tr'))[1]).find('th').click();
+      return expect(mock.fn).toHaveBeenCalled();
+    });
     it('should mirror the original <tr>\'s className', function() {
       this.element.find('thead tr').addClass('test');
       this.scope.createClone();

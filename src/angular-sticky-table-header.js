@@ -45,7 +45,7 @@ angular
 
 					return angular
 						.element(scope.tr)
-						.clone()
+						.clone(true, true)
 						.addClass(options.cloneClassName)
 						.appendTo(element.find('thead'));
 

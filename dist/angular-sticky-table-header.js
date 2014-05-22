@@ -50,7 +50,7 @@ angular.module('stickyTableHeader', ['watchDom']).value('stickyTableHeaderOption
           tr: element.find('tr')[0],
           clone: null,
           createClone: function () {
-            return angular.element(scope.tr).clone().addClass(options.cloneClassName).appendTo(element.find('thead'));
+            return angular.element(scope.tr).clone(true, true).addClass(options.cloneClassName).appendTo(element.find('thead'));
           },
           resetClone: _.debounce(function () {
             scope.removeClones();
