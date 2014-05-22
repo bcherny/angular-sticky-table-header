@@ -1,8 +1,32 @@
-angular.module('stickyTableHeader', []).value('options', {
+angular.module('watchDom', []).constant('watchDomOptions', {
+  attributes: true,
+  characterData: true,
+  childList: true
+}).service('watchDom', [
+  '$window',
+  'watchDomOptions',
+  function ($window, watchDomOptions) {
+    this.$watch = function (element, cb, options) {
+      if (!angular.isElement(element)) {
+        throw new TypeError('watchDom expects its 1st argument to be a DOMElement, but was given ', element);
+      }
+      if (!angular.isFunction(cb)) {
+        throw new TypeError('watchDom expects its 2nd argument to be a Function, but was given ', cb);
+      }
+      var mutationObserver = new $window.MutationObserver(function (mutationRecord) {
+          cb(mutationRecord, mutationRecord.oldValue);
+        });
+      mutationObserver.observe(element, angular.extend({}, watchDomOptions, options));
+      return mutationObserver.disconnect;
+    };
+  }
+]);
+angular.module('stickyTableHeader', ['watchDom']).value('stickyTableHeaderOptions', {
   cloneClassName: 'sticky-clone',
   stuckClassName: 'sticky-stuck',
-  interval: 10
-}).service('util', function () {
+  interval: 10,
+  observeHeaderInterval: 100
+}).service('stickyTableHeaderUtil', function () {
   this.guard = function (fn, condition) {
     return function () {
       return condition() ? fn.apply(this, arguments) : false;
@@ -11,19 +35,28 @@ angular.module('stickyTableHeader', []).value('options', {
 }).directive('stickyTableHeader', [
   '$timeout',
   '$window',
-  'options',
-  'util',
-  function ($timeout, $window, options, util) {
+  'stickyTableHeaderOptions',
+  'stickyTableHeaderUtil',
+  'watchDom',
+  function ($timeout, $window, stickyTableHeaderOptions, stickyTableHeaderUtil, watchDom) {
+    var options = stickyTableHeaderOptions, util = stickyTableHeaderUtil;
     return {
       restrict: 'A',
       link: function (scope, element, attrs) {
         angular.extend(scope, {
-          clone: null,
           isStuck: false,
+          mutationObserver: null,
           offset: {},
-          doClone: function () {
-            return $(element.find('tr')[0]).clone().addClass(options.cloneClassName).appendTo(element.find('thead'));
+          tr: element.find('tr')[0],
+          clone: null,
+          createClone: function () {
+            return angular.element(scope.tr).clone().addClass(options.cloneClassName).appendTo(element.find('thead'));
           },
+          resetClone: _.debounce(function () {
+            scope.removeClones();
+            scope.clone = scope.createClone();
+            scope.sizeClone();
+          }, 200),
           removeClones: function () {
             scope.isStuck = false;
             element.find('.' + options.cloneClassName).remove();
@@ -41,7 +74,7 @@ angular.module('stickyTableHeader', []).value('options', {
             });
           }),
           setOffset: function () {
-            scope.offset = element.find('tr')[0].getBoundingClientRect();
+            scope.offset = scope.tr.getBoundingClientRect();
           },
           setStuck: function (bool) {
             scope.$apply(function () {
@@ -64,33 +97,30 @@ angular.module('stickyTableHeader', []).value('options', {
             } else if (scope.isStuck && scroll < scope.offset.top) {
               scope.setStuck(false);
             }
-          })
+          }),
+          observeTr: function () {
+            scope.mutationObserver = watchDom.$watch(scope.tr, _.throttle(scope.resetClone, options.observeHeaderInterval), { subtree: true });
+          }
         });
-        // watch columns, regenerate cloned row when they change
-        if (attrs.columns) {
-          scope.$watch(function () {
-            return scope[attrs.columns];
-          }, $timeout.bind(null, function () {
-            scope.removeClones();
-            scope.clone = scope.doClone();
-          }));
-        }
         // watch rows, and re-measure column widths when they change
         if (attrs.rows) {
           scope.$watch(function () {
             return scope[attrs.rows];
           }, $timeout.bind(null, scope.setClonedCellWidths));
         }
-        // fired when a clone is created
-        scope.$watch('clone', scope.sizeClone);
         // fired when stuck state changes
         scope.$watch('isStuck', scope.toggleClone);
-        // fired when the offset is re-measured
-        scope.$watch('offset.left', scope.sizeClone);
+        // start observing header for DOM changes
+        scope.observeTr();
         // listen on window resize event
         angular.element($window).on({
-          resize: _.debounce(scope.setClonedCellWidths.bind(scope), options.interval),
-          scroll: _.debounce(scope.checkScroll.bind(scope), options.interval)
+          'resize.angularStickyTableHeader': _.debounce(scope.setClonedCellWidths.bind(scope), options.interval),
+          'scroll.angularStickyTableHeader': _.debounce(scope.checkScroll.bind(scope), options.interval)
+        });
+        // teardown
+        scope.$on('$destroy', function () {
+          angular.element($window).off('.angularStickyTableHeader');
+          scope.mutationObserver();
         });
         // helpers
         function ifClone(fn) {
