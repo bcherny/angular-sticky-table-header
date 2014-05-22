@@ -19,7 +19,7 @@ describe('angular-sticky-table-header', function() {
     on: function() {},
     off: function() {}
   };
-  beforeEach(module('stickyTableHeader'), function($provide) {
+  beforeEach(module('turn/stickyTableHeader'), function($provide) {
     $provide.value('options', options);
     $provide.value('$window', $window);
     return null;

@@ -14,7 +14,7 @@ describe 'angular-sticky-table-header', ->
 		on: ->
 		off: ->
 
-	beforeEach (module 'stickyTableHeader'), ($provide) ->
+	beforeEach (module 'turn/stickyTableHeader'), ($provide) ->
 		
 		$provide.value 'options', options
 		$provide.value '$window', $window

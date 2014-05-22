@@ -1,5 +1,5 @@
 angular
-.module('stickyTableHeader', ['watchDom'])
+.module('turn/stickyTableHeader', ['watchDom'])
 .value('stickyTableHeaderOptions', {
 	cloneClassName: 'sticky-clone',
 	stuckClassName: 'sticky-stuck',

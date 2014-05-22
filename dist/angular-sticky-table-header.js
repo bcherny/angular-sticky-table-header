@@ -21,7 +21,7 @@ angular.module('watchDom', []).constant('watchDomOptions', {
     };
   }
 ]);
-angular.module('stickyTableHeader', ['watchDom']).value('stickyTableHeaderOptions', {
+angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderOptions', {
   cloneClassName: 'sticky-clone',
   stuckClassName: 'sticky-stuck',
   interval: 10,

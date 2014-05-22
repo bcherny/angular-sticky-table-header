@@ -27,13 +27,14 @@ angular-sticky-table-header [![Build Status](https://travis-ci.org/turn/angular-
 	</div>
 </div>
 ...
+<script src="angular-sticky-table-header.js"></script>
 ```
 
 **js**
 
 ```js
 angular
-.module('foo', ['stickyTableHeader'])
+.module('foo', ['turn/stickyTableHeader'])
 .controller('fooCtrl', ['$scope', function ($scope) {
 	
 	$scope.rowCollection = [
