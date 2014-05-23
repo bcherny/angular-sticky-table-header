@@ -32,7 +32,7 @@ describe 'angular-sticky-table-header', ->
 				rowCollection: (Array.apply null, Array 200).map -> ['moo', 'woo', 'zoo']
 
 			@element = angular.element """
-				<div sticky-table-header columns="columnCollection" rows="rowCollection">
+				<div sticky-table-header rows="rowCollection">
 
 					<table class="table">
 						<thead>
@@ -380,6 +380,24 @@ describe 'angular-sticky-table-header', ->
 			.not.toHaveBeenCalled
 
 
+	describe '#rowsChanged', ->
+
+		it 'should call #checkScroll and #setClonedCellWidths after a $timeout', inject ($timeout) ->
+
+			spyOn @scope, 'checkScroll'
+			spyOn @scope, 'setClonedCellWidths'
+
+			do @scope.rowsChanged
+
+			do $timeout.flush
+
+			do expect @scope.checkScroll
+			.toHaveBeenCalled
+
+			do expect @scope.setClonedCellWidths
+			.toHaveBeenCalled
+
+
 	describe '$destroy', ->
 
 		# TODO
@@ -395,5 +413,3 @@ describe 'angular-sticky-table-header', ->
 
 			expect @scope.mutationObserver
 			.toHaveBeenCalled()
-
-

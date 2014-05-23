@@ -34,7 +34,7 @@ describe('angular-sticky-table-header', function() {
             return ['moo', 'woo', 'zoo'];
           })
         });
-        _this.element = angular.element("<div sticky-table-header columns=\"columnCollection\" rows=\"rowCollection\">\n\n	<table class=\"table\">\n		<thead>\n			<tr>\n				<th ng-repeat=\"th in columnCollection\">{{th}}</th>\n			</tr>\n		</thead>\n		<tbody>\n			<tr ng-repeat=\"tr in rowCollection\">\n				<td ng-repeat=\"td in tr\">{{td}}</td>\n			</tr>\n		</tbody>\n	</table>\n\n</div>");
+        _this.element = angular.element("<div sticky-table-header rows=\"rowCollection\">\n\n	<table class=\"table\">\n		<thead>\n			<tr>\n				<th ng-repeat=\"th in columnCollection\">{{th}}</th>\n			</tr>\n		</thead>\n		<tbody>\n			<tr ng-repeat=\"tr in rowCollection\">\n				<td ng-repeat=\"td in tr\">{{td}}</td>\n			</tr>\n		</tbody>\n	</table>\n\n</div>");
         ($compile(_this.element))(_this.scope);
         _this.scope.$digest();
         return $window = {
@@ -243,6 +243,16 @@ describe('angular-sticky-table-header', function() {
       this.scope.checkScroll();
       return expect(this.scope.setStuck).not.toHaveBeenCalled();
     });
+  });
+  describe('#rowsChanged', function() {
+    return it('should call #checkScroll and #setClonedCellWidths after a $timeout', inject(function($timeout) {
+      spyOn(this.scope, 'checkScroll');
+      spyOn(this.scope, 'setClonedCellWidths');
+      this.scope.rowsChanged();
+      $timeout.flush();
+      expect(this.scope.checkScroll).toHaveBeenCalled();
+      return expect(this.scope.setClonedCellWidths).toHaveBeenCalled();
+    }));
   });
   return describe('$destroy', function() {
     return it('should remove the mutation observer', function() {

@@ -137,6 +137,15 @@ angular
 						{ subtree: true }
 					);
 
+				},
+
+				rowsChanged: function () {
+
+					$timeout(function(){
+						scope.checkScroll();
+						scope.setClonedCellWidths();
+					});
+
 				}
 
 			});
@@ -145,7 +154,7 @@ angular
 			if (attrs.rows) {
 				scope.$watch(function(){
 					return scope[attrs.rows];
-				}, $timeout.bind(null, scope.setClonedCellWidths));
+				}, scope.rowsChanged);
 			}
 
 			// fired when stuck state changes

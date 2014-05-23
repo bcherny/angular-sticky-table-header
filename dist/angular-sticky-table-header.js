@@ -100,13 +100,19 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
           }),
           observeTr: function () {
             scope.mutationObserver = watchDom.$watch(scope.tr, _.throttle(scope.resetClone, options.observeHeaderInterval), { subtree: true });
+          },
+          rowsChanged: function () {
+            $timeout(function () {
+              scope.checkScroll();
+              scope.setClonedCellWidths();
+            });
           }
         });
         // watch rows, and re-measure column widths when they change
         if (attrs.rows) {
           scope.$watch(function () {
             return scope[attrs.rows];
-          }, $timeout.bind(null, scope.setClonedCellWidths));
+          }, scope.rowsChanged);
         }
         // fired when stuck state changes
         scope.$watch('isStuck', scope.toggleClone);
