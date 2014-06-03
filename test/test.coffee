@@ -52,6 +52,7 @@ describe 'angular-sticky-table-header', ->
 
 			($compile @element) @scope
 			do @scope.$digest
+			@scope = do @element.scope
 
 			$window =
 				scrollY: 0
@@ -79,7 +80,7 @@ describe 'angular-sticky-table-header', ->
 			do @scope.createClone
 
 			expect ($((@element.find 'thead tr')[1]).find 'th').length
-			.toBe @scope.columnCollection.length
+			.toBe @scope.$parent.columnCollection.length
 
 		it 'should clone the <tr>\'s events', ->
 

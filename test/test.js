@@ -37,6 +37,7 @@ describe('angular-sticky-table-header', function() {
         _this.element = angular.element("<div sticky-table-header rows=\"rowCollection\">\n\n	<table class=\"table\">\n		<thead>\n			<tr>\n				<th ng-repeat=\"th in columnCollection\">{{th}}</th>\n			</tr>\n		</thead>\n		<tbody>\n			<tr ng-repeat=\"tr in rowCollection\">\n				<td ng-repeat=\"td in tr\">{{td}}</td>\n			</tr>\n		</tbody>\n	</table>\n\n</div>");
         ($compile(_this.element))(_this.scope);
         _this.scope.$digest();
+        _this.scope = _this.element.scope();
         return $window = {
           scrollY: 0,
           on: function() {},
@@ -53,7 +54,7 @@ describe('angular-sticky-table-header', function() {
     });
     it('should clone the <tr>\'s contents', function() {
       this.scope.createClone();
-      return expect(($((this.element.find('thead tr'))[1]).find('th')).length).toBe(this.scope.columnCollection.length);
+      return expect(($((this.element.find('thead tr'))[1]).find('th')).length).toBe(this.scope.$parent.columnCollection.length);
     });
     it('should clone the <tr>\'s events', function() {
       var clone, mock;

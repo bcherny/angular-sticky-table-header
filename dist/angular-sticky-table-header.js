@@ -42,7 +42,13 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
     var options = stickyTableHeaderOptions, util = stickyTableHeaderUtil;
     return {
       restrict: 'A',
-      link: function (scope, element, attrs) {
+      scope: {
+        disabled: '=',
+        rows: '='
+      },
+      template: '<div ng-transclude></div>',
+      transclude: true,
+      link: function (scope, element) {
         angular.extend(scope, {
           isStuck: false,
           mutationObserver: null,
@@ -109,11 +115,7 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
           }
         });
         // watch rows, and re-measure column widths when they change
-        if (attrs.rows) {
-          scope.$watch(function () {
-            return scope[attrs.rows];
-          }, scope.rowsChanged);
-        }
+        scope.$watch('rows', scope.rowsChanged);
         // fired when stuck state changes
         scope.$watch('isStuck', scope.toggleClone);
         // start observing header for DOM changes

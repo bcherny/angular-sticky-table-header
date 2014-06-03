@@ -20,7 +20,10 @@ angular-sticky-table-header [![Build Status](https://travis-ci.org/turn/angular-
 <body>
 
 <div ng-controller="fooCtrl">
-	<div sticky-table-header rows="rowCollection">
+	<div
+		sticky-table-header
+		rows="rowCollection"
+	>
 		<table>
 			...
 		</table>
