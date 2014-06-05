@@ -99,10 +99,10 @@ describe('angular-sticky-table-header', function() {
     });
   });
   describe('#removeClones', function() {
-    it('should set scope.isStuck to false', function() {
+    it('should set scope.stuck to false', function() {
       this.scope.createClone();
       this.scope.removeClones();
-      return expect(this.scope.isStuck).toBe(false);
+      return expect(this.scope.stuck).toBe(false);
     });
     return it('should remove all <tr> clones', function() {
       this.scope.createClone();
@@ -128,37 +128,37 @@ describe('angular-sticky-table-header', function() {
     });
   });
   describe('#setOffset', function() {
-    it('should call getBoundingClientRect on the first <tr>', function() {
-      spyOn((this.element.find('tr'))[0], 'getBoundingClientRect');
+    it('should call getOffset on the first <tr>', function() {
+      spyOn(($()).__proto__, 'offset');
       this.scope.setOffset();
-      return expect((this.element.find('tr'))[0].getBoundingClientRect).toHaveBeenCalled();
+      return expect(($()).__proto__.offset).toHaveBeenCalled();
     });
     return it('should set scope.offset equal to the value returned by getBoundingClientRect', function() {
       this.scope.offset = null;
-      spyOn((this.element.find('tr'))[0], 'getBoundingClientRect').andReturn('foo');
+      spyOn(($()).__proto__, 'offset').andReturn('foo');
       this.scope.setOffset();
       return expect(this.scope.offset).toEqual('foo');
     });
   });
   describe('#setStuck', function() {
-    it('should set scope.isStuck equal to the boolean passed into it', function() {
-      this.scope.isStuck = null;
+    it('should set scope.stuck equal to the boolean passed into it', function() {
+      this.scope.stuck = null;
       this.scope.setStuck(true);
-      return expect(this.scope.isStuck).toBe(true);
+      return expect(this.scope.stuck).toBe(true);
     });
     return it('should coerce non-boolean values into booleans', function() {
       this.scope.setStuck(true);
-      expect(this.scope.isStuck).toBe(true);
+      expect(this.scope.stuck).toBe(true);
       this.scope.setStuck('foo');
-      expect(this.scope.isStuck).toBe(true);
+      expect(this.scope.stuck).toBe(true);
       this.scope.setStuck(42);
-      expect(this.scope.isStuck).toBe(true);
+      expect(this.scope.stuck).toBe(true);
       this.scope.setStuck(null);
-      expect(this.scope.isStuck).toBe(false);
+      expect(this.scope.stuck).toBe(false);
       this.scope.setStuck(0);
-      expect(this.scope.isStuck).toBe(false);
+      expect(this.scope.stuck).toBe(false);
       this.scope.setStuck(false);
-      return expect(this.scope.isStuck).toBe(false);
+      return expect(this.scope.stuck).toBe(false);
     });
   });
   describe('#toggleClone', function() {
@@ -207,9 +207,9 @@ describe('angular-sticky-table-header', function() {
       spyOn(this.scope, 'setStuck');
       return spyOn(this.scope, 'setClonedCellWidths').andCallFake(function() {});
     });
-    it('should call #setStuck with true and #setClonedCellWidths with no arguments when scope.isStuck is false and scrollY is >= offset.top', function() {
+    it('should call #setStuck with true and #setClonedCellWidths with no arguments when scope.stuck is false and scrollY is >= offset.top', function() {
       this.scope.clone = true;
-      this.scope.isStuck = false;
+      this.scope.stuck = false;
       this.scope.offset = {
         top: 0
       };
@@ -218,9 +218,9 @@ describe('angular-sticky-table-header', function() {
       expect(this.scope.setStuck).toHaveBeenCalledWith(true);
       return expect(this.scope.setClonedCellWidths).toHaveBeenCalled();
     });
-    it('should call #setStuck with false when scope.isStuck is true and scrollY is < offset.top', function() {
+    it('should call #setStuck with false when scope.stuck is true and scrollY is < offset.top', function() {
       this.scope.clone = true;
-      this.scope.isStuck = true;
+      this.scope.stuck = true;
       this.scope.offset = {
         top: 1
       };
@@ -230,13 +230,13 @@ describe('angular-sticky-table-header', function() {
     });
     return it('should not call #setStuck otherwise', function() {
       this.scope.clone = true;
-      this.scope.isStuck = true;
+      this.scope.stuck = true;
       this.scope.offset = {
         top: 0
       };
       $window.scrollY = 1;
       this.scope.checkScroll();
-      this.scope.isStuck = false;
+      this.scope.stuck = false;
       this.scope.offset = {
         top: 1
       };
@@ -255,12 +255,82 @@ describe('angular-sticky-table-header', function() {
       return expect(this.scope.setClonedCellWidths).toHaveBeenCalled();
     }));
   });
-  return describe('$destroy', function() {
-    return it('should remove the mutation observer', function() {
+  describe('#on', function() {
+    return it('should call #observeTr and #addEvents with no arguments', function() {
+      spyOn(this.scope, 'observeTr');
+      spyOn(this.scope, 'addEvents');
+      this.scope.on();
+      expect(this.scope.observeTr).toHaveBeenCalledWith;
+      return expect(this.scope.addEvents).toHaveBeenCalledWith;
+    });
+  });
+  describe('#off', function() {
+    return it('should call #mutationObserver, #removeEvents, and #removeClones with no arguments', function() {
       this.scope.mutationObserver = function() {};
       spyOn(this.scope, 'mutationObserver');
-      this.scope.$destroy();
-      return expect(this.scope.mutationObserver).toHaveBeenCalled();
+      spyOn(this.scope, 'removeEvents');
+      spyOn(this.scope, 'removeClones');
+      this.scope.off();
+      expect(this.scope.mutationObserver).toHaveBeenCalledWith;
+      expect(this.scope.removeEvents).toHaveBeenCalledWith;
+      return expect(this.scope.removeClones).toHaveBeenCalledWith;
     });
+  });
+  describe('#changeDisabled', function() {
+    it('shouldn\'t call anything if the 1st argument is identical to the 2nd argument', function() {
+      spyOn(this.scope, 'on');
+      spyOn(this.scope, 'off');
+      spyOn(this.scope, 'resetClone');
+      this.scope.changeDisabled(true, true);
+      expect(this.scope.on).not.toHaveBeenCalled();
+      expect(this.scope.off).not.toHaveBeenCalled();
+      return expect(this.scope.resetClone).not.toHaveBeenCalled();
+    });
+    it('should call #off with no arguments if the 1st argument is truthy', function() {
+      spyOn(this.scope, 'off');
+      this.scope.changeDisabled(true);
+      return expect(this.scope.off).toHaveBeenCalledWith;
+    });
+    return it('should call #on and #resetClone with no arguments if the 1st argument is truthy', function() {
+      spyOn(this.scope, 'on');
+      spyOn(this.scope, 'resetClone');
+      this.scope.changeDisabled(false);
+      expect(this.scope.on).toHaveBeenCalledWith;
+      return expect(this.scope.resetClone).toHaveBeenCalledWith;
+    });
+  });
+  describe('$destroy', function() {
+    return it('should call #off with no arguments', function() {
+      this.scope.mutationObserver = function() {};
+      spyOn(this.scope, 'off');
+      this.scope.$destroy();
+      return expect(this.scope.off).toHaveBeenCalledWith;
+    });
+  });
+  return describe('$watches', function() {
+    it('should call #changeDisabled when scope.disabled changes', inject(function($timeout) {
+      spyOn(this.scope, 'changeDisabled');
+      this.element.attr('disabled', 'foo');
+      this.scope.$apply();
+      return $timeout(function() {
+        return expect(this.scope.changeDisabled).toHaveBeenCalled();
+      });
+    }));
+    it('should call #rowsChanged when scope.rows changes', inject(function($timeout) {
+      spyOn(this.scope, 'rowsChanged');
+      this.element.attr('rows', 'foo');
+      this.scope.$apply();
+      return $timeout(function() {
+        return expect(this.scope.rowsChanged).toHaveBeenCalled();
+      });
+    }));
+    return it('should call #toggleClone when scope.stuck changes', inject(function($timeout) {
+      spyOn(this.scope, 'toggleClone');
+      this.element.attr('stuck', 'foo');
+      this.scope.$apply();
+      return $timeout(function() {
+        return expect(this.scope.toggleClone).toHaveBeenCalled();
+      });
+    }));
   });
 });

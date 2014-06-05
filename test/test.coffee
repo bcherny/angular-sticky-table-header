@@ -154,12 +154,12 @@ describe 'angular-sticky-table-header', ->
 
 	describe '#removeClones', ->
 
-		it 'should set scope.isStuck to false', ->
+		it 'should set scope.stuck to false', ->
 
 			do @scope.createClone
 			do @scope.removeClones
 
-			expect @scope.isStuck
+			expect @scope.stuck
 			.toBe false
 
 		it 'should remove all <tr> clones', ->
@@ -200,20 +200,21 @@ describe 'angular-sticky-table-header', ->
 
 	describe '#setOffset', ->
 
-		it 'should call getBoundingClientRect on the first <tr>', ->
+		it 'should call getOffset on the first <tr>', ->
 
-			spyOn (@element.find 'tr')[0], 'getBoundingClientRect'
+			# TODO: there has to be a better way to do this
+			spyOn (do $).__proto__, 'offset'
 
 			do @scope.setOffset
 
-			do expect (@element.find 'tr')[0].getBoundingClientRect
+			do expect (do $).__proto__.offset
 			.toHaveBeenCalled
 
 		it 'should set scope.offset equal to the value returned by getBoundingClientRect', ->
 
 			@scope.offset = null
 
-			spyOn (@element.find 'tr')[0], 'getBoundingClientRect'
+			spyOn (do $).__proto__, 'offset'
 			.andReturn 'foo'
 
 			do @scope.setOffset
@@ -224,38 +225,38 @@ describe 'angular-sticky-table-header', ->
 
 	describe '#setStuck', ->
 
-		it 'should set scope.isStuck equal to the boolean passed into it', ->
+		it 'should set scope.stuck equal to the boolean passed into it', ->
 
-			@scope.isStuck = null
+			@scope.stuck = null
 			@scope.setStuck true
 
-			expect @scope.isStuck
+			expect @scope.stuck
 			.toBe true
 
 		it 'should coerce non-boolean values into booleans', ->
 
 			@scope.setStuck true
-			expect @scope.isStuck
+			expect @scope.stuck
 			.toBe true
 
 			@scope.setStuck 'foo'
-			expect @scope.isStuck
+			expect @scope.stuck
 			.toBe true
 
 			@scope.setStuck 42
-			expect @scope.isStuck
+			expect @scope.stuck
 			.toBe true
 
 			@scope.setStuck null
-			expect @scope.isStuck
+			expect @scope.stuck
 			.toBe false
 
 			@scope.setStuck 0
-			expect @scope.isStuck
+			expect @scope.stuck
 			.toBe false
 
 			@scope.setStuck false
-			expect @scope.isStuck
+			expect @scope.stuck
 			.toBe false
 
 
@@ -329,10 +330,10 @@ describe 'angular-sticky-table-header', ->
 			spyOn @scope, 'setClonedCellWidths'
 			.andCallFake ->
 
-		it 'should call #setStuck with true and #setClonedCellWidths with no arguments when scope.isStuck is false and scrollY is >= offset.top', ->
+		it 'should call #setStuck with true and #setClonedCellWidths with no arguments when scope.stuck is false and scrollY is >= offset.top', ->
 
 			@scope.clone = true
-			@scope.isStuck = false;
+			@scope.stuck = false;
 			@scope.offset =
 				top: 0
 			$window.scrollY = 1
@@ -345,10 +346,10 @@ describe 'angular-sticky-table-header', ->
 			do expect @scope.setClonedCellWidths
 			.toHaveBeenCalled
 
-		it 'should call #setStuck with false when scope.isStuck is true and scrollY is < offset.top', ->
+		it 'should call #setStuck with false when scope.stuck is true and scrollY is < offset.top', ->
 
 			@scope.clone = true
-			@scope.isStuck = true;
+			@scope.stuck = true;
 			@scope.offset =
 				top: 1
 			$window.scrollY = 0
@@ -360,17 +361,17 @@ describe 'angular-sticky-table-header', ->
 
 		it 'should not call #setStuck otherwise', ->
 
-			# isStuck = true, scrollY >= offset
+			# stuck = true, scrollY >= offset
 			@scope.clone = true
-			@scope.isStuck = true;
+			@scope.stuck = true;
 			@scope.offset =
 				top: 0
 			$window.scrollY = 1
 
 			do @scope.checkScroll
 
-			# isStuck = false, scrollY < offset
-			@scope.isStuck = false;
+			# stuck = false, scrollY < offset
+			@scope.stuck = false;
 			@scope.offset =
 				top: 1
 			$window.scrollY = 0
@@ -399,18 +400,134 @@ describe 'angular-sticky-table-header', ->
 			.toHaveBeenCalled
 
 
-	describe '$destroy', ->
+	describe '#on', ->
 
-		# TODO
-		# it 'should remove DOM events', ->
+		it 'should call #observeTr and #addEvents with no arguments', ->
 
-		it 'should remove the mutation observer', ->
+			spyOn @scope, 'observeTr'
+			spyOn @scope, 'addEvents'
+
+			do @scope.on
+
+			expect @scope.observeTr
+			.toHaveBeenCalledWith
+
+			expect @scope.addEvents
+			.toHaveBeenCalledWith
+
+
+	describe '#off', ->
+
+		it 'should call #mutationObserver, #removeEvents, and #removeClones with no arguments', ->
 
 			@scope.mutationObserver = ->
 
 			spyOn @scope, 'mutationObserver'
+			spyOn @scope, 'removeEvents'
+			spyOn @scope, 'removeClones'
+
+			do @scope.off
+
+			expect @scope.mutationObserver
+			.toHaveBeenCalledWith
+
+			expect @scope.removeEvents
+			.toHaveBeenCalledWith
+
+			expect @scope.removeClones
+			.toHaveBeenCalledWith
+
+
+	describe '#changeDisabled', ->
+
+		it 'shouldn\'t call anything if the 1st argument is identical to the 2nd argument', ->
+
+			spyOn @scope, 'on'
+			spyOn @scope, 'off'
+			spyOn @scope, 'resetClone'
+
+			@scope.changeDisabled true, true
+
+			do expect @scope.on
+			.not.toHaveBeenCalled
+
+			do expect @scope.off
+			.not.toHaveBeenCalled
+
+			do expect @scope.resetClone
+			.not.toHaveBeenCalled
+
+		it 'should call #off with no arguments if the 1st argument is truthy', ->
+
+			spyOn @scope, 'off'
+
+			@scope.changeDisabled true
+
+			expect @scope.off
+			.toHaveBeenCalledWith
+
+		it 'should call #on and #resetClone with no arguments if the 1st argument is truthy', ->
+
+			spyOn @scope, 'on'
+			spyOn @scope, 'resetClone'
+
+			@scope.changeDisabled false
+
+			expect @scope.on
+			.toHaveBeenCalledWith
+
+			expect @scope.resetClone
+			.toHaveBeenCalledWith
+
+
+	describe '$destroy', ->
+
+		it 'should call #off with no arguments', ->
+
+			@scope.mutationObserver = ->
+
+			spyOn @scope, 'off'
 
 			do @scope.$destroy
 
-			expect @scope.mutationObserver
-			.toHaveBeenCalled()
+			expect @scope.off
+			.toHaveBeenCalledWith
+
+
+	describe '$watches', ->
+
+		it 'should call #changeDisabled when scope.disabled changes', inject ($timeout) ->
+
+			spyOn @scope, 'changeDisabled'
+
+			@element.attr 'disabled', 'foo'
+
+			do @scope.$apply
+
+			$timeout ->
+				expect @scope.changeDisabled
+				.toHaveBeenCalled()
+
+		it 'should call #rowsChanged when scope.rows changes', inject ($timeout) ->
+
+			spyOn @scope, 'rowsChanged'
+
+			@element.attr 'rows', 'foo'
+
+			do @scope.$apply
+
+			$timeout ->
+				expect @scope.rowsChanged
+				.toHaveBeenCalled()
+
+		it 'should call #toggleClone when scope.stuck changes', inject ($timeout) ->
+
+			spyOn @scope, 'toggleClone'
+
+			@element.attr 'stuck', 'foo'
+
+			do @scope.$apply
+
+			$timeout ->
+				expect @scope.toggleClone
+				.toHaveBeenCalled()

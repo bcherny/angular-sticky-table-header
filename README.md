@@ -23,6 +23,7 @@ angular-sticky-table-header [![Build Status](https://travis-ci.org/turn/angular-
 	<div
 		sticky-table-header
 		rows="rowCollection"
+		disabled="expression"
 	>
 		<table>
 			...
@@ -44,6 +45,8 @@ angular
 		{ column1: 'foo', column2: 'bar', ... },
 		...
 	];
+
+	$scope.expression = false;
 
 });
 ```

@@ -33,7 +33,7 @@ angular
 			angular.extend(scope, {
 
 				// show the cloned <tr>?
-				isStuck: false,
+				stuck: false,
 
 				// MutationObserver bound to the original <tr>
 				mutationObserver: null,
@@ -67,7 +67,7 @@ angular
 
 				removeClones: function () {
 
-					scope.isStuck = false;
+					scope.stuck = false;
 
 					element
 						.find('.' + options.cloneClassName)
@@ -96,14 +96,14 @@ angular
 
 				setOffset: function () {
 
-					scope.offset = scope.tr.getBoundingClientRect();
+					scope.offset = angular.element(scope.tr).offset();
 
 				},
 
 				setStuck: function (bool) {
 
 					scope.$apply(function(){
-						scope.isStuck = !!bool;
+						scope.stuck = !!bool;
 					});
 
 				},
@@ -126,10 +126,10 @@ angular
 
 					var scroll = $window.scrollY;
 
-					if (!scope.isStuck && scroll >= scope.offset.top) {
+					if (!scope.stuck && scroll >= scope.offset.top) {
 						scope.setClonedCellWidths();
 						scope.setStuck(true);
-					} else if (scope.isStuck && scroll < scope.offset.top) {
+					} else if (scope.stuck && scroll < scope.offset.top) {
 						scope.setStuck(false);
 					}
 
@@ -152,34 +152,71 @@ angular
 						scope.setClonedCellWidths();
 					});
 
+				},
+
+				on: function () {
+
+					scope.observeTr();
+					scope.addEvents();
+
+				},
+
+				off: function () {
+
+					scope.mutationObserver();
+					scope.removeEvents();
+					scope.removeClones();
+
+				},
+
+				addEvents: function () {
+
+					angular.element($window).on({
+						'resize.angularStickyTableHeader': _.debounce(scope.setClonedCellWidths.bind(scope), options.interval),
+						'scroll.angularStickyTableHeader': _.debounce(scope.checkScroll.bind(scope), options.interval)
+					});
+
+				},
+
+				removeEvents: function () {
+
+					angular.element($window).off('.angularStickyTableHeader');
+					
+				},
+
+				changeDisabled: function (disabled, old) {
+
+					if (disabled === old) {
+						return;
+					}
+
+					if (disabled) {
+						scope.off();
+					} else {
+						scope.on();
+						scope.resetClone();
+					}
+
 				}
 
 			});
+
+			// enable/disable api
+			scope.$watch('disabled', scope.changeDisabled);
 			
 			// watch rows, and re-measure column widths when they change
 			scope.$watch('rows', scope.rowsChanged);
 
 			// fired when stuck state changes
-			scope.$watch('isStuck', scope.toggleClone);
-
-			// start observing header for DOM changes
-			scope.observeTr();
-
-			// listen on window resize event
-			angular.element($window).on({
-				'resize.angularStickyTableHeader': _.debounce(scope.setClonedCellWidths.bind(scope), options.interval),
-				'scroll.angularStickyTableHeader': _.debounce(scope.checkScroll.bind(scope), options.interval)
-			});
+			scope.$watch('stuck', scope.toggleClone);
 
 			// teardown
-			scope.$on('$destroy', function() {
-				angular.element($window).off('.angularStickyTableHeader');
-				scope.mutationObserver();
-			});
+			scope.$on('$destroy', scope.off);
 
+			// init
+			scope.on();
 
 			// helpers
-
 			function ifClone (fn) {
 				return util.guard(fn, cloneExists);
 			}
