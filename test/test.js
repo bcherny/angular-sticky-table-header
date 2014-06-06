@@ -358,12 +358,14 @@ describe('angular-sticky-table-header', function() {
       this.scope.changeDisabled(true);
       return expect(this.scope.off).toHaveBeenCalledWith;
     });
-    return it('should call #on and #resetClone with no arguments if the 1st argument is truthy', function() {
+    return it('should call #on and #resetClone with no arguments, and #toggleClone with false if the 1st argument is truthy', function() {
       spyOn(this.scope, 'on');
       spyOn(this.scope, 'resetClone');
+      spyOn(this.scope, 'toggleClone');
       this.scope.changeDisabled(false);
       expect(this.scope.on).toHaveBeenCalledWith;
-      return expect(this.scope.resetClone).toHaveBeenCalledWith;
+      expect(this.scope.resetClone).toHaveBeenCalledWith;
+      return expect(this.scope.toggleClone).toHaveBeenCalledWith(false);
     });
   });
   describe('$destroy', function() {

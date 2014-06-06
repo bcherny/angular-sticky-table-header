@@ -146,6 +146,7 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
             } else {
               scope.on();
               scope.resetClone();
+              scope.toggleClone(false);
             }
           }
         });
