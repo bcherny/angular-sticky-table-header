@@ -438,6 +438,123 @@ describe 'angular-sticky-table-header', ->
 			.toHaveBeenCalledWith
 
 
+	describe '#addEvents', ->
+
+		it 'should store decorated resize and scroll events on scope.windowEvents', ->
+
+			@scope.windowEvents = null
+
+			do @scope.addEvents
+
+			expect angular.isFunction @scope.windowEvents.resize
+			.toBe true
+
+			expect angular.isFunction @scope.windowEvents.scroll
+			.toBe true
+
+		it 'should bind those events to the $window', inject ($window) ->
+
+			spyOn (do $).__proto__, 'on'
+
+			do spyOn angular, 'element'
+			.andCallThrough
+
+			do @scope.addEvents
+
+			expect angular.element
+			.toHaveBeenCalledWith $window
+
+			expect (do $).__proto__.on
+			.toHaveBeenCalledWith @scope.windowEvents
+
+
+	describe '#removeEvents', ->
+
+		it 'should not reset scope.windowEvents or unbind events from the $window if windowEvents.resize or windowEvents.scroll are falsey', ->
+
+			spyOn (do $).__proto__, 'on'
+
+			# resize: falsey, scroll: truthy
+
+			events =
+				resize: null
+				scroll: null
+
+			@scope.windowEvents = angular.copy events
+
+			do @scope.removeEvents
+
+			do expect (do $).__proto__.on
+			.not.toHaveBeenCalled
+
+			expect @scope.windowEvents
+			.toEqual events
+
+			# resize: truthy, scroll: falsey
+
+			@scope.windowEvents =
+				resize: true
+				scroll: null
+
+			@scope.windowEvents = angular.copy events
+
+			do @scope.removeEvents
+
+			do expect (do $).__proto__.on
+			.not.toHaveBeenCalled
+
+			expect @scope.windowEvents
+			.toEqual events
+
+			# resize: falsey, scroll: truthy
+
+			@scope.windowEvents =
+				resize: null
+				scroll: true
+
+			@scope.windowEvents = angular.copy events
+
+			do @scope.removeEvents
+
+			do expect (do $).__proto__.on
+			.not.toHaveBeenCalled
+
+			expect @scope.windowEvents
+			.toEqual events
+
+		it 'should unbind events from the $window', inject ($window) ->
+
+			events =
+				resize: true
+				scroll: true
+
+			@scope.windowEvents = angular.copy events
+
+			spyOn (do $).__proto__, 'off'
+
+			do spyOn angular, 'element'
+			.andCallThrough
+
+			do @scope.removeEvents
+
+			expect angular.element
+			.toHaveBeenCalledWith $window
+
+			expect (do $).__proto__.off
+			.toHaveBeenCalledWith events
+
+		it 'should set scope.windowEvents to an empty object', ->
+
+			@scope.windowEvents =
+				resize: true
+				scroll: true
+
+			do @scope.removeEvents
+
+			expect @scope.windowEvents
+			.toEqual {}
+
+
 	describe '#changeDisabled', ->
 
 		it 'shouldn\'t call anything if the 1st argument is identical to the 2nd argument', ->
