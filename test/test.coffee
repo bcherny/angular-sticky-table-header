@@ -585,10 +585,11 @@ describe 'angular-sticky-table-header', ->
 			expect @scope.off
 			.toHaveBeenCalledWith
 
-		it 'should call #on and #resetClone with no arguments if the 1st argument is truthy', ->
+		it 'should call #on and #resetClone with no arguments, and #toggleClone with false if the 1st argument is truthy', ->
 
 			spyOn @scope, 'on'
 			spyOn @scope, 'resetClone'
+			spyOn @scope, 'toggleClone'
 
 			@scope.changeDisabled false
 
@@ -597,6 +598,9 @@ describe 'angular-sticky-table-header', ->
 
 			expect @scope.resetClone
 			.toHaveBeenCalledWith
+
+			expect @scope.toggleClone
+			.toHaveBeenCalledWith false
 
 
 	describe '$destroy', ->

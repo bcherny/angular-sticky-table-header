@@ -211,6 +211,7 @@ angular
 					} else {
 						scope.on();
 						scope.resetClone();
+						scope.toggleClone(false);
 					}
 
 				}
