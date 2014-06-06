@@ -55,6 +55,7 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
           offset: {},
           tr: element.find('tr')[0],
           clone: null,
+          windowEvents: {},
           createClone: function () {
             return angular.element(scope.tr).clone(true, true).addClass(options.cloneClassName).appendTo(element.find('thead'));
           },
@@ -123,13 +124,18 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
             scope.removeClones();
           },
           addEvents: function () {
-            angular.element($window).on({
-              'resize.angularStickyTableHeader': _.debounce(scope.setClonedCellWidths.bind(scope), options.interval),
-              'scroll.angularStickyTableHeader': _.debounce(scope.checkScroll.bind(scope), options.interval)
-            });
+            scope.windowEvents = {
+              scroll: _.debounce(scope.checkScroll.bind(scope), options.interval),
+              resize: _.debounce(scope.setClonedCellWidths.bind(scope), options.interval)
+            };
+            angular.element($window).on(scope.windowEvents);
           },
           removeEvents: function () {
-            angular.element($window).off('.angularStickyTableHeader');
+            if (!scope.windowEvents.resize || !scope.windowEvents.scroll) {
+              return;
+            }
+            angular.element($window).off(scope.windowEvents);
+            scope.windowEvents = {};
           },
           changeDisabled: function (disabled, old) {
             if (disabled === old) {

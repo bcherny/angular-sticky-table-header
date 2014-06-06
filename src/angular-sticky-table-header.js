@@ -47,6 +47,10 @@ angular
 				// cloned <tr>
 				clone: null,
 
+				// store references to events bound to the
+				// $window, so they can be safely removed
+				windowEvents: {},
+
 				createClone: function () {
 
 					return angular
@@ -171,16 +175,28 @@ angular
 
 				addEvents: function () {
 
-					angular.element($window).on({
-						'resize.angularStickyTableHeader': _.debounce(scope.setClonedCellWidths.bind(scope), options.interval),
-						'scroll.angularStickyTableHeader': _.debounce(scope.checkScroll.bind(scope), options.interval)
-					});
+					scope.windowEvents = {
+						scroll: _.debounce(scope.checkScroll.bind(scope), options.interval),
+						resize: _.debounce(scope.setClonedCellWidths.bind(scope), options.interval)
+					};
+
+					angular
+						.element($window)
+						.on(scope.windowEvents);
 
 				},
 
 				removeEvents: function () {
 
-					angular.element($window).off('.angularStickyTableHeader');
+					if (!scope.windowEvents.resize || !scope.windowEvents.scroll) {
+						return;
+					}
+
+					angular
+						.element($window)
+						.off(scope.windowEvents);
+
+					scope.windowEvents = {};
 					
 				},
 

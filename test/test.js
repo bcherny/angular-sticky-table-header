@@ -276,6 +276,72 @@ describe('angular-sticky-table-header', function() {
       return expect(this.scope.removeClones).toHaveBeenCalledWith;
     });
   });
+  describe('#addEvents', function() {
+    it('should store decorated resize and scroll events on scope.windowEvents', function() {
+      this.scope.windowEvents = null;
+      this.scope.addEvents();
+      expect(angular.isFunction(this.scope.windowEvents.resize)).toBe(true);
+      return expect(angular.isFunction(this.scope.windowEvents.scroll)).toBe(true);
+    });
+    return it('should bind those events to the $window', inject(function($window) {
+      spyOn(($()).__proto__, 'on');
+      spyOn(angular, 'element').andCallThrough();
+      this.scope.addEvents();
+      expect(angular.element).toHaveBeenCalledWith($window);
+      return expect(($()).__proto__.on).toHaveBeenCalledWith(this.scope.windowEvents);
+    }));
+  });
+  describe('#removeEvents', function() {
+    it('should not reset scope.windowEvents or unbind events from the $window if windowEvents.resize or windowEvents.scroll are falsey', function() {
+      var events;
+      spyOn(($()).__proto__, 'on');
+      events = {
+        resize: null,
+        scroll: null
+      };
+      this.scope.windowEvents = angular.copy(events);
+      this.scope.removeEvents();
+      expect(($()).__proto__.on).not.toHaveBeenCalled();
+      expect(this.scope.windowEvents).toEqual(events);
+      this.scope.windowEvents = {
+        resize: true,
+        scroll: null
+      };
+      this.scope.windowEvents = angular.copy(events);
+      this.scope.removeEvents();
+      expect(($()).__proto__.on).not.toHaveBeenCalled();
+      expect(this.scope.windowEvents).toEqual(events);
+      this.scope.windowEvents = {
+        resize: null,
+        scroll: true
+      };
+      this.scope.windowEvents = angular.copy(events);
+      this.scope.removeEvents();
+      expect(($()).__proto__.on).not.toHaveBeenCalled();
+      return expect(this.scope.windowEvents).toEqual(events);
+    });
+    it('should unbind events from the $window', inject(function($window) {
+      var events;
+      events = {
+        resize: true,
+        scroll: true
+      };
+      this.scope.windowEvents = angular.copy(events);
+      spyOn(($()).__proto__, 'off');
+      spyOn(angular, 'element').andCallThrough();
+      this.scope.removeEvents();
+      expect(angular.element).toHaveBeenCalledWith($window);
+      return expect(($()).__proto__.off).toHaveBeenCalledWith(events);
+    }));
+    return it('should set scope.windowEvents to an empty object', function() {
+      this.scope.windowEvents = {
+        resize: true,
+        scroll: true
+      };
+      this.scope.removeEvents();
+      return expect(this.scope.windowEvents).toEqual({});
+    });
+  });
   describe('#changeDisabled', function() {
     it('shouldn\'t call anything if the 1st argument is identical to the 2nd argument', function() {
       spyOn(this.scope, 'on');
