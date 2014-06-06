@@ -122,13 +122,15 @@ describe 'angular-sticky-table-header', ->
 
 	describe '#resetClone', ->
 
-		it 'should call #removeClones, #createClone, and #sizeClone', ->
+		it 'should call #removeClones, #createClone, and #sizeClone', inject ($timeout) ->
 
 			spyOn @scope, 'removeClones'
 			spyOn @scope, 'createClone'
 			spyOn @scope, 'sizeClone'
 
 			do @scope.resetClone
+
+			do $timeout.flush
 
 			expect @scope.removeClones
 			.toHaveBeenCalled()

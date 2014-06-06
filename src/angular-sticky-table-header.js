@@ -65,7 +65,7 @@ angular
 
 					scope.removeClones();
 					scope.clone = scope.createClone();
-					scope.sizeClone();
+					$timeout(scope.sizeClone);
 
 				}, 200),
 

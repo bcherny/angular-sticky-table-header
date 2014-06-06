@@ -62,7 +62,7 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
           resetClone: _.debounce(function () {
             scope.removeClones();
             scope.clone = scope.createClone();
-            scope.sizeClone();
+            $timeout(scope.sizeClone);
           }, 200),
           removeClones: function () {
             scope.stuck = false;
