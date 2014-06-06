@@ -78,15 +78,16 @@ describe('angular-sticky-table-header', function() {
     });
   });
   describe('#resetClone', function() {
-    it('should call #removeClones, #createClone, and #sizeClone', function() {
+    it('should call #removeClones, #createClone, and #sizeClone', inject(function($timeout) {
       spyOn(this.scope, 'removeClones');
       spyOn(this.scope, 'createClone');
       spyOn(this.scope, 'sizeClone');
       this.scope.resetClone();
+      $timeout.flush();
       expect(this.scope.removeClones).toHaveBeenCalled();
       expect(this.scope.createClone).toHaveBeenCalled();
       return expect(this.scope.sizeClone).toHaveBeenCalled();
-    });
+    }));
     return it('should set scope.clone to the value returned by #createClone', function() {
       this.scope.clone = null;
       this.scope.removeClones = function() {};
