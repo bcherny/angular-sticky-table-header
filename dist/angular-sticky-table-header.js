@@ -69,9 +69,9 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
             element.find('.' + options.cloneClassName).remove();
           },
           setClonedCellWidths: ifClone(function () {
-            var thClones = scope.clone.find('th');
-            angular.forEach(element.find('th'), function (th, n) {
-              $(thClones[n]).css('width', $(th).css('width'));
+            var clones = scope.clone.find('th'), ths = element.find('th');
+            angular.forEach(clones, function (clone, n) {
+              angular.element(clone).css('width', angular.element(ths[n]).css('width'));
             });
           }),
           setCloneGutter: ifClone(function () {
@@ -97,12 +97,14 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
             scope.setCloneGutter();
           }),
           checkScroll: ifClone(function () {
-            var scroll = $window.scrollY;
-            if (!scope.stuck && scroll >= scope.offset.top) {
+            var scrollY = $window.scrollY;
+            if (!scope.stuck && scrollY >= scope.offset.top) {
               scope.setClonedCellWidths();
               scope.setStuck(true);
-            } else if (scope.stuck && scroll < scope.offset.top) {
+            } else if (scope.stuck && scrollY < scope.offset.top) {
               scope.setStuck(false);
+            } else if ($window.scrollX) {
+              scope.clone.css('left', scope.offset.left - $window.scrollX);
             }
           }),
           observeTr: function () {
@@ -125,7 +127,7 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
           },
           addEvents: function () {
             scope.windowEvents = {
-              scroll: _.debounce(scope.checkScroll.bind(scope), options.interval),
+              scroll: scope.checkScroll,
               resize: scope.sizeClone
             };
             angular.element($window).on(scope.windowEvents);

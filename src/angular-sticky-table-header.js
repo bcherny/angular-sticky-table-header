@@ -81,10 +81,13 @@ angular
 
 				setClonedCellWidths: ifClone(function () {
 
-					var thClones = scope.clone.find('th');
+					var clones = scope.clone.find('th'),
+						ths = element.find('th');
 
-					angular.forEach(element.find('th'), function(th, n) {
-						$(thClones[n]).css('width', $(th).css('width'));
+					angular.forEach(clones, function(clone, n) {
+						angular
+							.element(clone)
+							.css('width', angular.element(ths[n]).css('width'));
 					});
 
 				}),
@@ -136,13 +139,17 @@ angular
 
 				checkScroll: ifClone(function() {
 
-					var scroll = $window.scrollY;
+					var scrollY = $window.scrollY;
 
-					if (!scope.stuck && scroll >= scope.offset.top) {
+					if (!scope.stuck && scrollY >= scope.offset.top) {
 						scope.setClonedCellWidths();
 						scope.setStuck(true);
-					} else if (scope.stuck && scroll < scope.offset.top) {
+					} else if (scope.stuck && scrollY < scope.offset.top) {
 						scope.setStuck(false);
+					} else if ($window.scrollX) {
+
+						scope.clone.css('left', scope.offset.left - $window.scrollX);
+
 					}
 
 				}),
@@ -184,7 +191,7 @@ angular
 				addEvents: function () {
 
 					scope.windowEvents = {
-						scroll: _.debounce(scope.checkScroll.bind(scope), options.interval),
+						scroll: scope.checkScroll,
 						resize: scope.sizeClone
 					};
 
