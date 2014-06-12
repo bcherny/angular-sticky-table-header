@@ -184,13 +184,13 @@ describe 'angular-sticky-table-header', ->
 
 	describe '#setCloneGutter', ->
 
-		it 'should set the <th> clone\'s left and right CSS equal to scope.offset', ->
+		it 'should set the <th> clone\'s left and width CSS equal to scope.offset', ->
 
 			@scope.clone =
 				css: ->
 			@scope.offset =
 				left: 1
-				right: 2
+				width: 2
 
 			spyOn @scope.clone, 'css'
 
@@ -202,27 +202,45 @@ describe 'angular-sticky-table-header', ->
 
 	describe '#setOffset', ->
 
-		it 'should call getOffset on the first <tr>', ->
+		it 'should call getBoundingClientRect on the first <tr>', ->
 
-			# TODO: there has to be a better way to do this
+			@scope.tr =
+				getBoundingClientRect: ->
+
+			spyOn @scope.tr, 'getBoundingClientRect'
+
+			do @scope.setOffset
+
+			do expect @scope.tr.getBoundingClientRect
+			.toHaveBeenCalledWith
+
+		it 'should call $.offset on the first <tr>', ->
+
 			spyOn (do $).__proto__, 'offset'
 
 			do @scope.setOffset
 
 			do expect (do $).__proto__.offset
-			.toHaveBeenCalled
+			.toHaveBeenCalledWith
 
-		it 'should set scope.offset equal to the value returned by getBoundingClientRect', ->
+		it 'should set scope.offset equal to the value returned by getBoundingClientRect extended with the value returned by $.offset', ->
 
 			@scope.offset = null
+			@scope.tr =
+				getBoundingClientRect: ->
+					foo: 'bar'
+					moo: 'zoo'
 
 			spyOn (do $).__proto__, 'offset'
-			.andReturn 'foo'
+			.andReturn
+				moo: 'woo'
 
 			do @scope.setOffset
 
 			expect @scope.offset
-			.toEqual 'foo'
+			.toEqual
+				foo: 'bar'
+				moo: 'woo'
 
 
 	describe '#setStuck', ->

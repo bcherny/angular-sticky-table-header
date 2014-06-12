@@ -77,11 +77,11 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
           setCloneGutter: ifClone(function () {
             scope.clone.css({
               left: scope.offset.left,
-              right: scope.offset.right
+              width: scope.offset.width
             });
           }),
           setOffset: function () {
-            scope.offset = angular.element(scope.tr).offset();
+            scope.offset = angular.extend({}, scope.tr.getBoundingClientRect(), angular.element(scope.tr).offset());
           },
           setStuck: function (bool) {
             scope.$apply(function () {
@@ -126,7 +126,7 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
           addEvents: function () {
             scope.windowEvents = {
               scroll: _.debounce(scope.checkScroll.bind(scope), options.interval),
-              resize: _.debounce(scope.setClonedCellWidths.bind(scope), options.interval)
+              resize: scope.sizeClone
             };
             angular.element($window).on(scope.windowEvents);
           },

@@ -93,14 +93,22 @@ angular
 
 					scope.clone.css({
 						left: scope.offset.left,
-						right: scope.offset.right
+						width: scope.offset.width
 					});
 
 				}),
 
 				setOffset: function () {
 
-					scope.offset = angular.element(scope.tr).offset();
+					scope.offset = angular.extend(
+						{},
+
+						// for the width
+						scope.tr.getBoundingClientRect(),
+
+						// for the proper top offset
+						angular.element(scope.tr).offset()
+					);
 
 				},
 
@@ -177,7 +185,7 @@ angular
 
 					scope.windowEvents = {
 						scroll: _.debounce(scope.checkScroll.bind(scope), options.interval),
-						resize: _.debounce(scope.setClonedCellWidths.bind(scope), options.interval)
+						resize: scope.sizeClone
 					};
 
 					angular

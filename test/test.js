@@ -115,13 +115,13 @@ describe('angular-sticky-table-header', function() {
     });
   });
   describe('#setCloneGutter', function() {
-    return it('should set the <th> clone\'s left and right CSS equal to scope.offset', function() {
+    return it('should set the <th> clone\'s left and width CSS equal to scope.offset', function() {
       this.scope.clone = {
         css: function() {}
       };
       this.scope.offset = {
         left: 1,
-        right: 2
+        width: 2
       };
       spyOn(this.scope.clone, 'css');
       this.scope.setCloneGutter();
@@ -129,16 +129,37 @@ describe('angular-sticky-table-header', function() {
     });
   });
   describe('#setOffset', function() {
-    it('should call getOffset on the first <tr>', function() {
+    it('should call getBoundingClientRect on the first <tr>', function() {
+      this.scope.tr = {
+        getBoundingClientRect: function() {}
+      };
+      spyOn(this.scope.tr, 'getBoundingClientRect');
+      this.scope.setOffset();
+      return expect(this.scope.tr.getBoundingClientRect).toHaveBeenCalledWith();
+    });
+    it('should call $.offset on the first <tr>', function() {
       spyOn(($()).__proto__, 'offset');
       this.scope.setOffset();
-      return expect(($()).__proto__.offset).toHaveBeenCalled();
+      return expect(($()).__proto__.offset).toHaveBeenCalledWith();
     });
-    return it('should set scope.offset equal to the value returned by getBoundingClientRect', function() {
+    return it('should set scope.offset equal to the value returned by getBoundingClientRect extended with the value returned by $.offset', function() {
       this.scope.offset = null;
-      spyOn(($()).__proto__, 'offset').andReturn('foo');
+      this.scope.tr = {
+        getBoundingClientRect: function() {
+          return {
+            foo: 'bar',
+            moo: 'zoo'
+          };
+        }
+      };
+      spyOn(($()).__proto__, 'offset').andReturn({
+        moo: 'woo'
+      });
       this.scope.setOffset();
-      return expect(this.scope.offset).toEqual('foo');
+      return expect(this.scope.offset).toEqual({
+        foo: 'bar',
+        moo: 'woo'
+      });
     });
   });
   describe('#setStuck', function() {
