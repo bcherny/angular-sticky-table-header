@@ -268,13 +268,13 @@ describe('angular-sticky-table-header', function() {
     });
   });
   describe('#rowsChanged', function() {
-    return it('should call #checkScroll and #setClonedCellWidths after a $timeout', inject(function($timeout) {
+    return it('should call #checkScroll and #setOffset after a $timeout', inject(function($timeout) {
       spyOn(this.scope, 'checkScroll');
-      spyOn(this.scope, 'setClonedCellWidths');
+      spyOn(this.scope, 'setOffset');
       this.scope.rowsChanged();
       $timeout.flush();
       expect(this.scope.checkScroll).toHaveBeenCalled();
-      return expect(this.scope.setClonedCellWidths).toHaveBeenCalled();
+      return expect(this.scope.setOffset).toHaveBeenCalled();
     }));
   });
   describe('#on', function() {

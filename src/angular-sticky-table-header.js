@@ -160,8 +160,8 @@ angular
 				rowsChanged: function () {
 
 					$timeout(function(){
+						scope.setOffset();
 						scope.checkScroll();
-						scope.setClonedCellWidths();
 					});
 
 				},
