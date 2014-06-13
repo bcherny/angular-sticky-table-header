@@ -129,36 +129,28 @@ describe('angular-sticky-table-header', function() {
     });
   });
   describe('#setOffset', function() {
+    beforeEach(function() {
+      spyOn(this.element[0], 'getBoundingClientRect').andReturn({
+        width: 'bar',
+        top: 'zoo'
+      });
+      spyOn(($()).__proto__, 'offset').andReturn({
+        width: 'woo',
+        top: 'moo'
+      });
+      this.scope.offset = null;
+      return this.scope.setOffset();
+    });
     it('should call getBoundingClientRect on the first <tr>', function() {
-      this.scope.tr = {
-        getBoundingClientRect: function() {}
-      };
-      spyOn(this.scope.tr, 'getBoundingClientRect');
-      this.scope.setOffset();
-      return expect(this.scope.tr.getBoundingClientRect).toHaveBeenCalledWith();
+      return expect(this.element[0].getBoundingClientRect).toHaveBeenCalledWith();
     });
     it('should call $.offset on the first <tr>', function() {
-      spyOn(($()).__proto__, 'offset');
-      this.scope.setOffset();
       return expect(($()).__proto__.offset).toHaveBeenCalledWith();
     });
-    return it('should set scope.offset equal to the value returned by getBoundingClientRect extended with the value returned by $.offset', function() {
-      this.scope.offset = null;
-      this.scope.tr = {
-        getBoundingClientRect: function() {
-          return {
-            foo: 'bar',
-            moo: 'zoo'
-          };
-        }
-      };
-      spyOn(($()).__proto__, 'offset').andReturn({
-        moo: 'woo'
-      });
-      this.scope.setOffset();
+    return it('should set scope.offset equal to the width returned by getBoundingClientRect and the top returned by $.offset', function() {
       return expect(this.scope.offset).toEqual({
-        foo: 'bar',
-        moo: 'woo'
+        width: 'bar',
+        top: 'moo'
       });
     });
   });

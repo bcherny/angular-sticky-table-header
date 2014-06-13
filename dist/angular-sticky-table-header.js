@@ -81,7 +81,10 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
             });
           }),
           setOffset: function () {
-            scope.offset = angular.extend({}, scope.tr.getBoundingClientRect(), angular.element(scope.tr).offset());
+            scope.offset = {
+              width: element[0].getBoundingClientRect().width,
+              top: angular.element(scope.tr).offset().top
+            };
           },
           setStuck: function (bool) {
             scope.$apply(function () {

@@ -103,15 +103,10 @@ angular
 
 				setOffset: function () {
 
-					scope.offset = angular.extend(
-						{},
-
-						// for the width
-						scope.tr.getBoundingClientRect(),
-
-						// for the proper top offset
-						angular.element(scope.tr).offset()
-					);
+					scope.offset = {
+						width: element[0].getBoundingClientRect().width,
+						top: angular.element(scope.tr).offset().top
+					};
 
 				},
 

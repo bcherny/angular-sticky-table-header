@@ -202,45 +202,38 @@ describe 'angular-sticky-table-header', ->
 
 	describe '#setOffset', ->
 
-		it 'should call getBoundingClientRect on the first <tr>', ->
+		beforeEach ->
 
-			@scope.tr =
-				getBoundingClientRect: ->
+			spyOn @element[0], 'getBoundingClientRect'
+			.andReturn
+				width: 'bar'
+				top: 'zoo'
 
-			spyOn @scope.tr, 'getBoundingClientRect'
+			spyOn (do $).__proto__, 'offset'
+			.andReturn
+				width: 'woo'
+				top: 'moo'
+
+			@scope.offset = null
 
 			do @scope.setOffset
 
-			do expect @scope.tr.getBoundingClientRect
+		it 'should call getBoundingClientRect on the first <tr>', ->
+
+			do expect @element[0].getBoundingClientRect
 			.toHaveBeenCalledWith
 
 		it 'should call $.offset on the first <tr>', ->
 
-			spyOn (do $).__proto__, 'offset'
-
-			do @scope.setOffset
-
 			do expect (do $).__proto__.offset
 			.toHaveBeenCalledWith
 
-		it 'should set scope.offset equal to the value returned by getBoundingClientRect extended with the value returned by $.offset', ->
-
-			@scope.offset = null
-			@scope.tr =
-				getBoundingClientRect: ->
-					foo: 'bar'
-					moo: 'zoo'
-
-			spyOn (do $).__proto__, 'offset'
-			.andReturn
-				moo: 'woo'
-
-			do @scope.setOffset
+		it 'should set scope.offset equal to the width returned by getBoundingClientRect and the top returned by $.offset', ->
 
 			expect @scope.offset
 			.toEqual
-				foo: 'bar'
-				moo: 'woo'
+				width: 'bar'
+				top: 'moo'
 
 
 	describe '#setStuck', ->
