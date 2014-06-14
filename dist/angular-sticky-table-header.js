@@ -49,7 +49,6 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
       template: '<div ng-transclude></div>',
       transclude: true,
       link: function (scope, element) {
-        console.log(element);
         angular.extend(scope, {
           stuck: false,
           mutationObserver: null,

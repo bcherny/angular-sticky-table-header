@@ -30,8 +30,6 @@ angular
 		transclude: true,
 		link: function (scope, element) {
 
-			console.log(element)
-
 			angular.extend(scope, {
 
 				// show the cloned <tr>?
