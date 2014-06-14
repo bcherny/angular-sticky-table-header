@@ -49,6 +49,7 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
       template: '<div ng-transclude></div>',
       transclude: true,
       link: function (scope, element) {
+        console.log(element);
         angular.extend(scope, {
           stuck: false,
           mutationObserver: null,
@@ -81,9 +82,11 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
             });
           }),
           setOffset: function () {
+            var offset = angular.element(scope.tr).offset();
             scope.offset = {
               width: element[0].getBoundingClientRect().width,
-              top: angular.element(scope.tr).offset().top
+              left: offset.left,
+              top: offset.top
             };
           },
           setStuck: function (bool) {

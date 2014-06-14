@@ -30,6 +30,8 @@ angular
 		transclude: true,
 		link: function (scope, element) {
 
+			console.log(element)
+
 			angular.extend(scope, {
 
 				// show the cloned <tr>?
@@ -103,9 +105,12 @@ angular
 
 				setOffset: function () {
 
+					var offset = angular.element(scope.tr).offset();
+
 					scope.offset = {
 						width: element[0].getBoundingClientRect().width,
-						top: angular.element(scope.tr).offset().top
+						left: offset.left,
+						top: offset.top
 					};
 
 				},
