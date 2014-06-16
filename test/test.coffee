@@ -397,10 +397,10 @@ describe 'angular-sticky-table-header', ->
 
 	describe '#rowsChanged', ->
 
-		it 'should call #checkScroll and #setOffset after a $timeout', inject ($timeout) ->
+		it 'should call #checkScroll and #sizeClone after a $timeout', inject ($timeout) ->
 
 			spyOn @scope, 'checkScroll'
-			spyOn @scope, 'setOffset'
+			spyOn @scope, 'sizeClone'
 
 			do @scope.rowsChanged
 
@@ -409,7 +409,7 @@ describe 'angular-sticky-table-header', ->
 			do expect @scope.checkScroll
 			.toHaveBeenCalled
 
-			do expect @scope.setOffset
+			do expect @scope.sizeClone
 			.toHaveBeenCalled
 
 

@@ -117,7 +117,7 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
           },
           rowsChanged: function () {
             $timeout(function () {
-              scope.setOffset();
+              scope.sizeClone();
               scope.checkScroll();
             });
           },

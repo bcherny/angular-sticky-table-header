@@ -165,7 +165,7 @@ angular
 				rowsChanged: function () {
 
 					$timeout(function(){
-						scope.setOffset();
+						scope.sizeClone();
 						scope.checkScroll();
 					});
 

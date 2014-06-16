@@ -260,13 +260,13 @@ describe('angular-sticky-table-header', function() {
     });
   });
   describe('#rowsChanged', function() {
-    return it('should call #checkScroll and #setOffset after a $timeout', inject(function($timeout) {
+    return it('should call #checkScroll and #sizeClone after a $timeout', inject(function($timeout) {
       spyOn(this.scope, 'checkScroll');
-      spyOn(this.scope, 'setOffset');
+      spyOn(this.scope, 'sizeClone');
       this.scope.rowsChanged();
       $timeout.flush();
       expect(this.scope.checkScroll).toHaveBeenCalled();
-      return expect(this.scope.setOffset).toHaveBeenCalled();
+      return expect(this.scope.sizeClone).toHaveBeenCalled();
     }));
   });
   describe('#on', function() {
