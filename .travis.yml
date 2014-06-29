@@ -5,7 +5,8 @@ before_install:
   - npm install -g bower
   - npm install -g grunt-cli
   - bower install
-before_script: 
+before_script:
+ - npm test
  - grunt jasmine:coverage
-script: 
+script:
  - grunt coveralls

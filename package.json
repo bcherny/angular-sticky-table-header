@@ -5,8 +5,7 @@
   "main": "dist/angular-sticky-table-header.js",
   "repository": "git://github.com/turn/angular-sticky-table-header.git",
   "scripts": {
-    "test": "grunt test:unit --verbose",
-    "coveralls": "grunt jasmine:coverage && grunt coveralls"
+    "test": "grunt test:unit --verbose"
   },
   "author": "Boris Cherny <bcherny@turn.com>",
   "license": "Apache2",
