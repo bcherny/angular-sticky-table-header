@@ -6,13 +6,14 @@ module.exports = (grunt) ->
 		'grunt-contrib-jasmine'
 		'grunt-contrib-sass'
 		'grunt-contrib-watch'
+		'grunt-coveralls'
 		'grunt-ngmin'
 	]
 	.forEach grunt.loadNpmTasks
 
 	# task sets
 	build = ['ngmin', 'concat', 'sass']
-	test = ['coffee', 'jasmine']
+	test = ['coffee', 'jasmine:unit']
 
 	# task defs
 	grunt.initConfig
@@ -28,8 +29,43 @@ module.exports = (grunt) ->
 				src: ['./bower_components/watch-dom/dist/watch-dom.js', './dist/<%= pkg.name %>.js']
 				dest: './dist/<%= pkg.name %>.js'
 
+		coveralls:
+			options:
+				force: true
+			main:
+				src: 'reports/lcov/lcov.info'
+
 		jasmine:
-			test:
+			coverage:
+				src: [
+					'./src/<%= pkg.name %>.js'
+				]
+				options:
+					specs: ['./test/test.js']
+					template: require 'grunt-template-jasmine-istanbul'
+					templateOptions:
+						coverage: 'reports/lcov/lcov.json'
+						report: [
+							{
+								type: 'html'
+								options:
+									dir: 'reports/html'
+							}
+							{
+								type: 'lcov'
+								options:
+									dir: 'reports/lcov'
+							}
+						]
+					type: 'lcovonly'
+					vendor: [
+						'./bower_components/lodash/dist/lodash.js'
+						'./bower_components/jquery/dist/jquery.js'
+						'./bower_components/angular/angular.js'
+						'./bower_components/angular-mocks/angular-mocks.js'
+						'./test/mock.js'
+					]
+			unit:
 				src: './src/<%= pkg.name %>.js'
 				options:
 					specs: './test/test.js'
@@ -68,4 +104,3 @@ module.exports = (grunt) ->
 
 	grunt.registerTask 'default', build
 	grunt.registerTask 'test', test
-	grunt.registerTask 'travis', ['jasmine']

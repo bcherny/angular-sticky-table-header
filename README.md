@@ -1,4 +1,4 @@
-angular-sticky-table-header [![Build Status](https://travis-ci.org/turn/angular-sticky-table-header.svg?branch=master)](https://travis-ci.org/turn/angular-sticky-table-header)
+angular-sticky-table-header [![Build Status](https://travis-ci.org/turn/angular-sticky-table-header.svg?branch=master)](https://travis-ci.org/turn/angular-sticky-table-header) [![Coverage Status](https://coveralls.io/repos/turn/angular-sticky-table-header/badge.png?branch=master)](https://coveralls.io/r/turn/angular-sticky-table-header?branch=master)
 ===========================
 
 ### dependencies

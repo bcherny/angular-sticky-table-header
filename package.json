@@ -3,19 +3,24 @@
   "version": "0.2.8",
   "description": "Sticky headers for tables",
   "main": "dist/angular-sticky-table-header.js",
+  "repository": "git://github.com/turn/angular-sticky-table-header.git",
   "scripts": {
-    "test": "grunt travis --verbose"
+    "test": "grunt test:unit --verbose",
+    "coveralls": "grunt jasmine:coverage && grunt coveralls"
   },
   "author": "Boris Cherny <bcherny@turn.com>",
   "license": "Apache2",
   "devDependencies": {
+    "coveralls": "^2.10.1",
     "grunt": "~0.4.4",
     "grunt-contrib-coffee": "^0.10.1",
     "grunt-contrib-concat": "^0.4.0",
     "grunt-contrib-jasmine": "^0.5.2",
     "grunt-contrib-sass": "^0.7.3",
     "grunt-contrib-watch": "^0.6.1",
-    "grunt-ngmin": "0.0.3"
+    "grunt-coveralls": "^0.3.0",
+    "grunt-ngmin": "0.0.3",
+    "grunt-template-jasmine-istanbul": "^0.2.6"
   },
   "keywords": [
     "sticky",
