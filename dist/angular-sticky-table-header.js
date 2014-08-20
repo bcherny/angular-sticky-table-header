@@ -46,7 +46,7 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
         disabled: '=',
         rows: '='
       },
-      template: '<div ng-transclude></div>',
+      template: '<div ng-transclude class="sticky-header"></div>',
       transclude: true,
       link: function (scope, element) {
         angular.extend(scope, {
@@ -56,6 +56,7 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
           tr: element.find('tr')[0],
           clone: null,
           windowEvents: {},
+          stickyHeader: element.find('.sticky-header'),
           createClone: function () {
             return angular.element(scope.tr).clone(true, true).addClass(options.cloneClassName).appendTo(element.find('thead'));
           },
@@ -71,7 +72,7 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
           setClonedCellWidths: ifClone(function () {
             var clones = scope.clone.find('th'), ths = element.find('th');
             angular.forEach(clones, function (clone, n) {
-              angular.element(clone).css('width', angular.element(ths[n]).css('width'));
+              angular.element(clone).css('min-width', angular.element(ths[n]).css('width'));
             });
           }),
           setCloneGutter: ifClone(function () {
@@ -81,9 +82,10 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
             });
           }),
           setOffset: function () {
-            var offset = angular.element(scope.tr).offset();
+            var offset = scope.stickyHeader.offset();
+            var width = Math.min(element[0].getBoundingClientRect().width, angular.element(scope.tr).width());
             scope.offset = {
-              width: element[0].getBoundingClientRect().width,
+              width: width,
               left: offset.left,
               top: offset.top
             };
@@ -103,13 +105,13 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
           }),
           checkScroll: ifClone(function () {
             var scrollY = $window.scrollY;
+            var scrollX = scope.stickyHeader.scrollLeft();
             if (!scope.stuck && scrollY >= scope.offset.top) {
-              scope.setClonedCellWidths();
               scope.setStuck(true);
             } else if (scope.stuck && scrollY < scope.offset.top) {
               scope.setStuck(false);
-            } else if ($window.scrollX) {
-              scope.clone.css('left', scope.offset.left - $window.scrollX);
+            } else if (scrollX) {
+              scope.clone.css('left', scope.offset.left - scrollX);
             }
           }),
           observeTr: function () {
@@ -136,6 +138,7 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
               resize: scope.sizeClone
             };
             angular.element($window).on(scope.windowEvents);
+            scope.stickyHeader.scroll(scope.checkScroll);
           },
           removeEvents: function () {
             if (!scope.windowEvents.resize || !scope.windowEvents.scroll) {
