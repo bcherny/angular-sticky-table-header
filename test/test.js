@@ -228,9 +228,8 @@ describe('angular-sticky-table-header', function() {
         top: 0
       };
       $window.scrollY = 1;
-      this.scope.checkScroll();
-      expect(this.scope.setStuck).toHaveBeenCalledWith(true);
-      return expect(this.scope.setClonedCellWidths).toHaveBeenCalled();
+      this.scope.checkScroll();      
+      return expect(this.scope.setStuck).toHaveBeenCalledWith(true);
     });
     it('should call #setStuck with false when scope.stuck is true and scrollY is < offset.top', function() {
       this.scope.clone = true;
