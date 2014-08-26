@@ -129,8 +129,11 @@ describe('angular-sticky-table-header', function() {
     });
   });
   describe('#setOffset', function() {
+    var table;
+    table = null;
     beforeEach(function() {
-      spyOn(this.element[0], 'getBoundingClientRect').andReturn({
+      table = (this.element.find('table')).get(0);
+      spyOn(table, 'getBoundingClientRect').andReturn({
         width: 'bar',
         top: 'zoo'
       });
@@ -142,7 +145,7 @@ describe('angular-sticky-table-header', function() {
       return this.scope.setOffset();
     });
     it('should call getBoundingClientRect on the first <tr>', function() {
-      return expect(this.element[0].getBoundingClientRect).toHaveBeenCalledWith();
+      return expect(table.getBoundingClientRect).toHaveBeenCalledWith();
     });
     it('should call $.offset on the first <tr>', function() {
       return expect(($()).__proto__.offset).toHaveBeenCalledWith();
