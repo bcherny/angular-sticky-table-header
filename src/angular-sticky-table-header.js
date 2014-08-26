@@ -106,7 +106,7 @@ angular
 					var offset = angular.element(scope.tr).offset();
 
 					scope.offset = {
-						width: element[0].getBoundingClientRect().width,
+						width: element.find('table').get(0).getBoundingClientRect().width,
 						left: offset.left,
 						top: offset.top
 					};

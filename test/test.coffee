@@ -202,9 +202,13 @@ describe 'angular-sticky-table-header', ->
 
 	describe '#setOffset', ->
 
+		table = null
+
 		beforeEach ->
 
-			spyOn @element[0], 'getBoundingClientRect'
+			table = (@element.find 'table').get 0
+
+			spyOn table, 'getBoundingClientRect'
 			.andReturn
 				width: 'bar'
 				top: 'zoo'
@@ -220,7 +224,7 @@ describe 'angular-sticky-table-header', ->
 
 		it 'should call getBoundingClientRect on the first <tr>', ->
 
-			do expect @element[0].getBoundingClientRect
+			do expect table.getBoundingClientRect
 			.toHaveBeenCalledWith
 
 		it 'should call $.offset on the first <tr>', ->
