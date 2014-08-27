@@ -15,6 +15,7 @@ describe('angular-sticky-table-header', function() {
     }
   };
   $window = {
+    scrollX: 0,
     scrollY: 0,
     on: function() {},
     off: function() {}
@@ -224,26 +225,63 @@ describe('angular-sticky-table-header', function() {
       spyOn(this.scope, 'setStuck');
       return spyOn(this.scope, 'setClonedCellWidths').andCallFake(function() {});
     });
-    it('should call #setStuck with true and #setClonedCellWidths with no arguments when scope.stuck is false and scrollY is >= offset.top', function() {
-      this.scope.clone = true;
-      this.scope.stuck = false;
-      this.scope.offset = {
-        top: 0
-      };
-      $window.scrollY = 1;
-      this.scope.checkScroll();
-      expect(this.scope.setStuck).toHaveBeenCalledWith(true);
-      return expect(this.scope.setClonedCellWidths).toHaveBeenCalled();
+    [
+      {
+        elementScrollY: 0,
+        windowScrollY: 0
+      }, {
+        elementScrollY: 0,
+        windowScrollY: 1
+      }, {
+        elementScrollY: 1,
+        windowScrollY: 0
+      }, {
+        elementScrollY: 1,
+        windowScrollY: 1
+      }, {
+        elementScrollY: 2,
+        windowScrollY: -1
+      }, {
+        elementScrollY: -1,
+        windowScrollY: 2
+      }
+    ].forEach(function(data) {
+      return it('should call #setStuck with true and #setClonedCellWidths with no arguments when scope.stuck is false and scrollY is >= offset.top', function() {
+        spyOn(this.element, 'scrollTop').andReturn(data.elementScrollY);
+        this.scope.clone = true;
+        this.scope.stuck = false;
+        this.scope.offset = {
+          top: 0
+        };
+        $window.scrollY = data.windowScrollY;
+        this.scope.checkScroll();
+        expect(this.scope.setStuck).toHaveBeenCalledWith(true);
+        return expect(this.scope.setClonedCellWidths).toHaveBeenCalled();
+      });
     });
-    it('should call #setStuck with false when scope.stuck is true and scrollY is < offset.top', function() {
-      this.scope.clone = true;
-      this.scope.stuck = true;
-      this.scope.offset = {
-        top: 1
-      };
-      $window.scrollY = 0;
-      this.scope.checkScroll();
-      return expect(this.scope.setStuck).toHaveBeenCalledWith(false);
+    [
+      {
+        elementScrollY: 0,
+        windowScrollY: 0
+      }, {
+        elementScrollY: 0,
+        windowScrollY: -1
+      }, {
+        elementScrollY: -1,
+        windowScrollY: 0
+      }
+    ].forEach(function(data) {
+      return it('should call #setStuck with false when scope.stuck is true and scrollY is < offset.top', function() {
+        spyOn(this.element, 'scrollTop').andReturn(data.elementScrollY);
+        this.scope.clone = true;
+        this.scope.stuck = true;
+        this.scope.offset = {
+          top: 1
+        };
+        $window.scrollY = data.windowScrollY;
+        this.scope.checkScroll();
+        return expect(this.scope.setStuck).toHaveBeenCalledWith(false);
+      });
     });
     return it('should not call #setStuck otherwise', function() {
       this.scope.clone = true;
@@ -294,48 +332,111 @@ describe('angular-sticky-table-header', function() {
     });
   });
   describe('#addEvents', function() {
-    it('should store decorated resize and scroll events on scope.windowEvents', function() {
+    it('should store resize and scroll events on scope.windowEvents', function() {
       this.scope.windowEvents = null;
       this.scope.addEvents();
-      expect(angular.isFunction(this.scope.windowEvents.resize)).toBe(true);
-      return expect(angular.isFunction(this.scope.windowEvents.scroll)).toBe(true);
+      expect(this.scope.windowEvents.resize).toBe(this.scope.sizeClone);
+      return expect(this.scope.windowEvents.scroll).toBe(this.scope.checkScroll);
     });
-    return it('should bind those events to the $window', inject(function($window) {
+    it('should store the scroll event on scope.elementEvents', function() {
+      this.scope.elementEvents = null;
+      this.scope.addEvents();
+      return expect(this.scope.elementEvents.scroll).toBe(this.scope.checkScroll);
+    });
+    it('should bind windowEvents to the $window', inject(function($window) {
       spyOn(($()).__proto__, 'on');
       spyOn(angular, 'element').andCallThrough();
       this.scope.addEvents();
       expect(angular.element).toHaveBeenCalledWith($window);
       return expect(($()).__proto__.on).toHaveBeenCalledWith(this.scope.windowEvents);
     }));
+    return it('should bind elementEvents to the element', function() {
+      spyOn(($()).__proto__, 'on');
+      this.scope.addEvents();
+      return expect(($()).__proto__.on).toHaveBeenCalledWith(this.scope.elementEvents);
+    });
   });
   describe('#removeEvents', function() {
-    it('should not reset scope.windowEvents or unbind events from the $window if windowEvents.resize or windowEvents.scroll are falsey', function() {
-      var events;
+    it('should not reset scope.windowEvents or unbind events from the $window if windowEvents.resize, windowEvents.scroll, or elementEvents.scroll are falsey', function() {
       spyOn(($()).__proto__, 'on');
+      return [
+        {
+          elementEvents: {
+            scroll: null
+          },
+          windowEvents: {
+            resize: null,
+            scroll: null
+          }
+        }, {
+          elementEvents: {
+            scroll: true
+          },
+          windowEvents: {
+            resize: null,
+            scroll: null
+          }
+        }, {
+          elementEvents: {
+            scroll: null
+          },
+          windowEvents: {
+            resize: true,
+            scroll: null
+          }
+        }, {
+          elementEvents: {
+            scroll: null
+          },
+          windowEvents: {
+            resize: null,
+            scroll: true
+          }
+        }, {
+          elementEvents: {
+            scroll: true
+          },
+          windowEvents: {
+            resize: true,
+            scroll: null
+          }
+        }, {
+          elementEvents: {
+            scroll: true
+          },
+          windowEvents: {
+            resize: null,
+            scroll: true
+          }
+        }, {
+          elementEvents: {
+            scroll: null
+          },
+          windowEvents: {
+            resize: true,
+            scroll: true
+          }
+        }
+      ].forEach((function(_this) {
+        return function(vars) {
+          _this.scope.elementEvents = vars.elementEvents;
+          _this.scope.windowEvents = vars.windowEvents;
+          _this.scope.removeEvents();
+          expect(($()).__proto__.on).not.toHaveBeenCalled();
+          expect(_this.scope.elementEvents).toEqual(vars.elementEvents);
+          return expect(_this.scope.windowEvents).toEqual(vars.windowEvents);
+        };
+      })(this));
+    });
+    it('should unbind events from the element', function() {
+      var events;
       events = {
-        resize: null,
-        scroll: null
-      };
-      this.scope.windowEvents = angular.copy(events);
-      this.scope.removeEvents();
-      expect(($()).__proto__.on).not.toHaveBeenCalled();
-      expect(this.scope.windowEvents).toEqual(events);
-      this.scope.windowEvents = {
-        resize: true,
-        scroll: null
-      };
-      this.scope.windowEvents = angular.copy(events);
-      this.scope.removeEvents();
-      expect(($()).__proto__.on).not.toHaveBeenCalled();
-      expect(this.scope.windowEvents).toEqual(events);
-      this.scope.windowEvents = {
-        resize: null,
         scroll: true
       };
-      this.scope.windowEvents = angular.copy(events);
+      this.scope.elementEvents = angular.copy(events);
+      spyOn(($()).__proto__, 'off');
       this.scope.removeEvents();
-      expect(($()).__proto__.on).not.toHaveBeenCalled();
-      return expect(this.scope.windowEvents).toEqual(events);
+      return expect(($()).__proto__.off).toHaveBeenCalledWith(events);
     });
     it('should unbind events from the $window', inject(function($window) {
       var events;
@@ -350,6 +451,13 @@ describe('angular-sticky-table-header', function() {
       expect(angular.element).toHaveBeenCalledWith($window);
       return expect(($()).__proto__.off).toHaveBeenCalledWith(events);
     }));
+    it('should set scope.elementEvents to an empty object', function() {
+      this.scope.elementEvents = {
+        scroll: true
+      };
+      this.scope.removeEvents();
+      return expect(this.scope.elementEvents).toEqual({});
+    });
     return it('should set scope.windowEvents to an empty object', function() {
       this.scope.windowEvents = {
         resize: true,

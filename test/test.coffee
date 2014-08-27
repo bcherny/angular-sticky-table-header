@@ -10,6 +10,7 @@ describe 'angular-sticky-table-header', ->
 		throttle: (fn) -> fn
 
 	$window =
+		scrollX: 0
 		scrollY: 0
 		on: ->
 		off: ->
@@ -347,56 +348,76 @@ describe 'angular-sticky-table-header', ->
 			spyOn @scope, 'setClonedCellWidths'
 			.andCallFake ->
 
-		it 'should call #setStuck with true and #setClonedCellWidths with no arguments when scope.stuck is false and scrollY is >= offset.top', ->
+		[
+			{ elementScrollY: 0, windowScrollY: 0 }
+			{ elementScrollY: 0, windowScrollY: 1 }
+			{ elementScrollY: 1, windowScrollY: 0 }
+			{ elementScrollY: 1, windowScrollY: 1 }
+			{ elementScrollY: 2, windowScrollY: -1 }
+			{ elementScrollY: -1, windowScrollY: 2 }
+		].forEach (data) ->
 
-			@scope.clone = true
-			@scope.stuck = false;
-			@scope.offset =
-				top: 0
-			$window.scrollY = 1
+			it 'should call #setStuck with true and #setClonedCellWidths with no arguments when scope.stuck is false and scrollY is >= offset.top', ->
 
-			do @scope.checkScroll
+				spyOn @element, 'scrollTop'
+				.andReturn data.elementScrollY
 
-			expect @scope.setStuck
-			.toHaveBeenCalledWith true
+				@scope.clone = true
+				@scope.stuck = false
+				@scope.offset = top: 0
+				$window.scrollY = data.windowScrollY
 
-			do expect @scope.setClonedCellWidths
-			.toHaveBeenCalled
+				do @scope.checkScroll
 
-		it 'should call #setStuck with false when scope.stuck is true and scrollY is < offset.top', ->
+				expect @scope.setStuck
+				.toHaveBeenCalledWith true
 
-			@scope.clone = true
-			@scope.stuck = true;
-			@scope.offset =
-				top: 1
-			$window.scrollY = 0
+				do expect @scope.setClonedCellWidths
+				.toHaveBeenCalled
 
-			do @scope.checkScroll
+		[
+			{ elementScrollY: 0, windowScrollY: 0 }
+			{ elementScrollY: 0, windowScrollY: -1 }
+			{ elementScrollY: -1, windowScrollY: 0 }
+		].forEach (data) ->
 
-			expect @scope.setStuck
-			.toHaveBeenCalledWith false
+			it 'should call #setStuck with false when scope.stuck is true and scrollY is < offset.top', ->
+
+				spyOn @element, 'scrollTop'
+				.andReturn data.elementScrollY
+
+				@scope.clone = true
+				@scope.stuck = true
+				@scope.offset = top: 1
+				$window.scrollY = data.windowScrollY
+
+				do @scope.checkScroll
+
+				expect @scope.setStuck
+				.toHaveBeenCalledWith false
 
 		it 'should not call #setStuck otherwise', ->
 
 			# stuck = true, scrollY >= offset
 			@scope.clone = true
-			@scope.stuck = true;
-			@scope.offset =
-				top: 0
+			@scope.stuck = true
+			@scope.offset = top: 0
 			$window.scrollY = 1
 
 			do @scope.checkScroll
 
 			# stuck = false, scrollY < offset
-			@scope.stuck = false;
-			@scope.offset =
-				top: 1
+			@scope.stuck = false
+			@scope.offset = top: 1
 			$window.scrollY = 0
 
 			do @scope.checkScroll
 
 			do expect @scope.setStuck
 			.not.toHaveBeenCalled
+
+
+	# TODO: add tests for `if (scrollX) { ... }`
 
 
 	describe '#rowsChanged', ->
@@ -457,19 +478,28 @@ describe 'angular-sticky-table-header', ->
 
 	describe '#addEvents', ->
 
-		it 'should store decorated resize and scroll events on scope.windowEvents', ->
+		it 'should store resize and scroll events on scope.windowEvents', ->
 
 			@scope.windowEvents = null
 
 			do @scope.addEvents
 
-			expect angular.isFunction @scope.windowEvents.resize
-			.toBe true
+			expect @scope.windowEvents.resize
+			.toBe @scope.sizeClone
 
-			expect angular.isFunction @scope.windowEvents.scroll
-			.toBe true
+			expect @scope.windowEvents.scroll
+			.toBe @scope.checkScroll
 
-		it 'should bind those events to the $window', inject ($window) ->
+		it 'should store the scroll event on scope.elementEvents', ->
+
+			@scope.elementEvents = null
+
+			do @scope.addEvents
+
+			expect @scope.elementEvents.scroll
+			.toBe @scope.checkScroll
+
+		it 'should bind windowEvents to the $window', inject ($window) ->
 
 			spyOn (do $).__proto__, 'on'
 
@@ -484,60 +514,81 @@ describe 'angular-sticky-table-header', ->
 			expect (do $).__proto__.on
 			.toHaveBeenCalledWith @scope.windowEvents
 
-
-	describe '#removeEvents', ->
-
-		it 'should not reset scope.windowEvents or unbind events from the $window if windowEvents.resize or windowEvents.scroll are falsey', ->
+		it 'should bind elementEvents to the element', ->
 
 			spyOn (do $).__proto__, 'on'
 
-			# resize: falsey, scroll: truthy
+			do @scope.addEvents
+
+			expect (do $).__proto__.on
+			.toHaveBeenCalledWith @scope.elementEvents
+
+
+	describe '#removeEvents', ->
+
+		it 'should not reset scope.windowEvents or unbind events from the $window if windowEvents.resize, windowEvents.scroll, or elementEvents.scroll are falsey', ->
+
+			spyOn (do $).__proto__, 'on'
+
+			[
+				{
+					elementEvents: scroll: null
+					windowEvents: resize: null, scroll: null
+				}
+				{
+					elementEvents: scroll: true
+					windowEvents: resize: null, scroll: null
+				}
+				{
+					elementEvents: scroll: null
+					windowEvents: resize: true, scroll: null
+				}
+				{
+					elementEvents: scroll: null
+					windowEvents: resize: null, scroll: true
+				}
+				{
+					elementEvents: scroll: true
+					windowEvents: resize: true, scroll: null
+				}
+				{
+					elementEvents: scroll: true
+					windowEvents: resize: null, scroll: true
+				}
+				{
+					elementEvents: scroll: null
+					windowEvents: resize: true, scroll: true
+				}
+			].forEach (vars) =>
+
+				# set mock vars
+				@scope.elementEvents = vars.elementEvents
+				@scope.windowEvents = vars.windowEvents
+
+				do @scope.removeEvents
+
+				do expect (do $).__proto__.on
+				.not.toHaveBeenCalled
+
+				expect @scope.elementEvents
+				.toEqual vars.elementEvents
+
+				expect @scope.windowEvents
+				.toEqual vars.windowEvents
+
+		it 'should unbind events from the element', ->
 
 			events =
-				resize: null
-				scroll: null
-
-			@scope.windowEvents = angular.copy events
-
-			do @scope.removeEvents
-
-			do expect (do $).__proto__.on
-			.not.toHaveBeenCalled
-
-			expect @scope.windowEvents
-			.toEqual events
-
-			# resize: truthy, scroll: falsey
-
-			@scope.windowEvents =
-				resize: true
-				scroll: null
-
-			@scope.windowEvents = angular.copy events
-
-			do @scope.removeEvents
-
-			do expect (do $).__proto__.on
-			.not.toHaveBeenCalled
-
-			expect @scope.windowEvents
-			.toEqual events
-
-			# resize: falsey, scroll: truthy
-
-			@scope.windowEvents =
-				resize: null
 				scroll: true
 
-			@scope.windowEvents = angular.copy events
+			@scope.elementEvents = angular.copy events
+
+			spyOn (do $).__proto__, 'off'
 
 			do @scope.removeEvents
 
-			do expect (do $).__proto__.on
-			.not.toHaveBeenCalled
-
-			expect @scope.windowEvents
-			.toEqual events
+			expect (do $).__proto__.off
+			.toHaveBeenCalledWith events
 
 		it 'should unbind events from the $window', inject ($window) ->
 
@@ -559,6 +610,16 @@ describe 'angular-sticky-table-header', ->
 
 			expect (do $).__proto__.off
 			.toHaveBeenCalledWith events
+
+		it 'should set scope.elementEvents to an empty object', ->
+
+			@scope.elementEvents =
+				scroll: true
+
+			do @scope.removeEvents
+
+			expect @scope.elementEvents
+			.toEqual {}
 
 		it 'should set scope.windowEvents to an empty object', ->
 

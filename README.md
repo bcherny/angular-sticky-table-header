@@ -86,5 +86,4 @@ grunt
 
 ### todo
 
-- more unit tests
 - end to end tests

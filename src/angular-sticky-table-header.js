@@ -137,17 +137,18 @@ angular
 
 				checkScroll: ifClone(function() {
 
-					var scrollY = $window.scrollY;
+					var scrollY = ($window.scrollY || 0) + element.scrollTop(),
+						scrollX = ($window.scrollX || 0) + element.scrollLeft();
 
 					if (!scope.stuck && scrollY >= scope.offset.top) {
 						scope.setClonedCellWidths();
 						scope.setStuck(true);
 					} else if (scope.stuck && scrollY < scope.offset.top) {
 						scope.setStuck(false);
-					} else if ($window.scrollX) {
+					}
 
-						scope.clone.css('left', scope.offset.left - $window.scrollX);
-
+					if (scrollX) {
+						scope.clone.css('left', scope.offset.left - scrollX);
 					}
 
 				}),
@@ -188,6 +189,10 @@ angular
 
 				addEvents: function () {
 
+					scope.elementEvents = {
+						scroll: scope.checkScroll
+					};
+
 					scope.windowEvents = {
 						scroll: scope.checkScroll,
 						resize: scope.sizeClone
@@ -197,11 +202,14 @@ angular
 						.element($window)
 						.on(scope.windowEvents);
 
+					element
+						.on(scope.elementEvents);
+
 				},
 
 				removeEvents: function () {
 
-					if (!scope.windowEvents.resize || !scope.windowEvents.scroll) {
+					if (!scope.windowEvents.resize || !scope.windowEvents.scroll || !scope.elementEvents.scroll) {
 						return;
 					}
 
@@ -209,6 +217,10 @@ angular
 						.element($window)
 						.off(scope.windowEvents);
 
+					element
+						.off(scope.elementEvents);
+
+					scope.elementEvents = {};
 					scope.windowEvents = {};
 					
 				},
