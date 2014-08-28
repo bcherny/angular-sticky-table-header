@@ -51,6 +51,9 @@ angular
 				// $window, so they can be safely removed
 				windowEvents: {},
 
+				// use this to determine whether reset offset is necessary
+				useCachedOffset : false,
+
 				createClone: function () {
 
 					return angular
@@ -62,7 +65,7 @@ angular
 				},
 
 				resetClone: _.debounce(function () {
-
+					scope.useCachedOffset = false;
 					scope.removeClones();
 					scope.clone = scope.createClone();
 					$timeout(scope.sizeClone);
@@ -103,7 +106,7 @@ angular
 
 				setOffset: function () {
 
-					var offset = angular.element(scope.tr).offset();
+					var offset = scope.useCachedOffset ? scope.offset:angular.element(scope.tr).offset();
 
 					scope.offset = {
 						width: element.find('table').get(0).getBoundingClientRect().width,
@@ -165,6 +168,7 @@ angular
 
 				rowsChanged: function () {
 
+					scope.useCachedOffset = true;
 					$timeout(function(){
 						scope.sizeClone();
 						scope.checkScroll();
@@ -195,7 +199,10 @@ angular
 
 					scope.windowEvents = {
 						scroll: scope.checkScroll,
-						resize: scope.sizeClone
+						resize: function () {
+							scope.useCachedOffset = false;
+							scope.sizeClone();
+						}
 					};
 
 					angular
