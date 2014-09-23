@@ -64,69 +64,11 @@ describe 'angular-sticky-table-header', ->
 	#########################################
 
 
-	describe '#createClone', ->
-
-		it 'should clone the first <tr> it finds and append it to the <thead>', ->
-
-			expect (@element.find 'thead tr').length
-			.toBe 1
-
-			do @scope.createClone
-
-			expect (@element.find 'thead tr').length
-			.toBe 2
-
-		it 'should clone the <tr>\'s contents', ->
-
-			do @scope.createClone
-
-			expect ($((@element.find 'thead tr')[1]).find 'th').length
-			.toBe @scope.$parent.columnCollection.length
-
-		it 'should clone the <tr>\'s events', ->
-
-			mock =
-				fn: ->
-
-			spyOn mock, 'fn'
-
-			$ (@element.find 'thead tr')[0]
-			.find 'th'
-			.on 'click', mock.fn
-
-			clone = do @scope.createClone
-
-			$ (@element.find 'thead tr')[1]
-			.find 'th'
-			.click()
-
-			expect mock.fn
-			.toHaveBeenCalled()
-
-		it 'should mirror the original <tr>\'s className', ->
-
-			@element.find 'thead tr'
-			.addClass 'test'
-
-			do @scope.createClone
-
-			expect $((@element.find 'thead tr')[1]).hasClass 'test'
-			.toBe true
-
-		it 'should assign the clone the className defined in options.cloneClassName', ->
-
-			do @scope.createClone
-
-			expect $((@element.find 'thead tr')[1]).hasClass options.cloneClassName
-			.toBe true
-
-
 	describe '#resetClone', ->
 
-		it 'should call #removeClones, #createClone, and #sizeClone', inject ($timeout) ->
+		it 'should call #removeClones, and #sizeClone', inject ($timeout) ->
 
 			spyOn @scope, 'removeClones'
-			spyOn @scope, 'createClone'
 			spyOn @scope, 'sizeClone'
 
 			do @scope.resetClone
@@ -136,49 +78,18 @@ describe 'angular-sticky-table-header', ->
 			expect @scope.removeClones
 			.toHaveBeenCalled()
 
-			expect @scope.createClone
-			.toHaveBeenCalled()
-
 			expect @scope.sizeClone
 			.toHaveBeenCalled()
 
-		it 'should set scope.clone to the value returned by #createClone', ->
-
-			@scope.clone = null
-			@scope.removeClones = ->
-			@scope.createClone = -> 42
-			@scope.sizeClone = ->
-
-			do @scope.resetClone
-
-			expect @scope.clone
-			.toBe 42
- 
 
 	describe '#removeClones', ->
 
 		it 'should set scope.stuck to false', ->
 
-			do @scope.createClone
 			do @scope.removeClones
 
 			expect @scope.stuck
 			.toBe false
-
-		it 'should remove all <tr> clones', ->
-
-			do @scope.createClone
-			do @scope.createClone
-			do @scope.createClone
-
-			expect (@element.find '.' + options.cloneClassName).length
-			.toBe 3
-
-			do @scope.removeClones
-
-			expect (@element.find '.' + options.cloneClassName).length
-			.toBe 0
-
 
 	# TODO: add tests for #setClonedCellWidths
 

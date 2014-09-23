@@ -29,7 +29,6 @@ angular
 		template: '<div ng-transclude></div>',
 		transclude: true,
 		link: function (scope, element) {
-
 			angular.extend(scope, {
 
 				// show the cloned <tr>?
@@ -51,20 +50,9 @@ angular
 				// $window, so they can be safely removed
 				windowEvents: {},
 
-				createClone: function () {
-
-					return angular
-						.element(scope.tr)
-						.clone(true, true)
-						.addClass(options.cloneClassName)
-						.appendTo(element.find('thead'));
-
-				},
-
 				resetClone: _.debounce(function () {
 
 					scope.removeClones();
-					scope.clone = scope.createClone();
 					$timeout(scope.sizeClone);
 
 				}, 200),
