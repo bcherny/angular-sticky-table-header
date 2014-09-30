@@ -110,7 +110,6 @@ angular
 						left: offset.left,
 						top: offset.top
 					};
-
 				},
 
 				setStuck: function (bool) {
@@ -132,6 +131,7 @@ angular
 					scope.setOffset();
 					scope.setClonedCellWidths();
 					scope.setCloneGutter();
+					scope.checkScroll();
 
 				}),
 
@@ -165,10 +165,7 @@ angular
 
 				rowsChanged: function () {
 
-					$timeout(function(){
-						scope.sizeClone();
-						scope.checkScroll();
-					});
+					$timeout(scope.sizeClone);
 
 				},
 
