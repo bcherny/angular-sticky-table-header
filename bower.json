@@ -1,10 +1,12 @@
 {
   "name": "angular-sticky-table-header",
-  "version": "0.2.10",
+  "version": "0.2.12",
   "description": "Sticky headers for tables",
   "main": "dist/angular-sticky-table-header.js",
+  "homepage": "https://github.com/turn/angular-sticky-table-header",
   "authors": [
-    "Boris Cherny <bcherny@turn.com>"
+    "Boris Cherny <bcherny@turn.com>",
+    "Nina Chen <nchen@turn.com>"
   ],
   "license": "Apache2",
   "dependencies": {

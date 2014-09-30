@@ -100,6 +100,7 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
             scope.setOffset();
             scope.setClonedCellWidths();
             scope.setCloneGutter();
+            scope.checkScroll();
           }),
           checkScroll: ifClone(function () {
             var scrollY = ($window.scrollY || 0) + element.scrollTop(), scrollX = ($window.scrollX || 0) + element.scrollLeft();
@@ -117,10 +118,7 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
             scope.mutationObserver = watchDom.$watch(scope.tr, _.throttle(scope.resetClone, options.observeHeaderInterval), { subtree: true });
           },
           rowsChanged: function () {
-            $timeout(function () {
-              scope.sizeClone();
-              scope.checkScroll();
-            });
+            $timeout(scope.sizeClone);
           },
           on: function () {
             scope.observeTr();

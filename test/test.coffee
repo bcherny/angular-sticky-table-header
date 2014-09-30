@@ -317,27 +317,32 @@ describe 'angular-sticky-table-header', ->
 
 	describe '#sizeClone', ->
 
-		it 'should call #setOffset, #setClonedCellWidths, and #setClonedCellWidths', ->
+		it 'should call #setOffset, #setClonedCellWidths, #setClonedCellWidths, and #checkScroll with no arguments', ->
 
 			@scope.clone = true
 			@scope.setClonedCellWidths = ->
 			@scope.setCloneGutter = ->
 			@scope.setOffset = ->
+			@scope.checkScroll = ->
 
 			spyOn @scope, 'setClonedCellWidths'
 			spyOn @scope, 'setCloneGutter'
 			spyOn @scope, 'setOffset'
+			spyOn @scope, 'checkScroll'
 
 			do @scope.sizeClone
 
-			do expect @scope.setOffset
-			.toHaveBeenCalled
+			expect @scope.setOffset
+			.toHaveBeenCalledWith
 
-			do expect @scope.setClonedCellWidths
-			.toHaveBeenCalled
+			expect @scope.setClonedCellWidths
+			.toHaveBeenCalledWith
 
-			do expect @scope.setCloneGutter
-			.toHaveBeenCalled
+			expect @scope.setCloneGutter
+			.toHaveBeenCalledWith
+
+			expect @scope.checkScroll
+			.toHaveBeenCalledWith
 
 
 	describe '#checkScroll', ->
@@ -422,20 +427,16 @@ describe 'angular-sticky-table-header', ->
 
 	describe '#rowsChanged', ->
 
-		it 'should call #checkScroll and #sizeClone after a $timeout', inject ($timeout) ->
+		it 'should call #sizeClone with no arguments after a $timeout', inject ($timeout) ->
 
-			spyOn @scope, 'checkScroll'
 			spyOn @scope, 'sizeClone'
 
 			do @scope.rowsChanged
 
 			do $timeout.flush
 
-			do expect @scope.checkScroll
-			.toHaveBeenCalled
-
-			do expect @scope.sizeClone
-			.toHaveBeenCalled
+			expect @scope.sizeClone
+			.toHaveBeenCalledWith
 
 
 	describe '#on', ->
