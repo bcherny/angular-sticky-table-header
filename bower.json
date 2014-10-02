@@ -1,6 +1,6 @@
 {
   "name": "angular-sticky-table-header",
-  "version": "0.2.12",
+  "version": "0.2.13",
   "description": "Sticky headers for tables",
   "main": "dist/angular-sticky-table-header.js",
   "homepage": "https://github.com/turn/angular-sticky-table-header",

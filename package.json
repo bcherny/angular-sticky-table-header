@@ -1,6 +1,6 @@
 {
   "name": "angular-sticky-table-header",
-  "version": "0.2.12",
+  "version": "0.2.13",
   "description": "Sticky headers for tables",
   "main": "dist/angular-sticky-table-header.js",
   "homepage": "https://github.com/turn/angular-sticky-table-header",
@@ -16,6 +16,7 @@
   "devDependencies": {
     "coveralls": "^2.10.1",
     "grunt": "~0.4.4",
+    "grunt-autoprefixer": "^1.0.1",
     "grunt-contrib-coffee": "^0.10.1",
     "grunt-contrib-concat": "^0.4.0",
     "grunt-contrib-jasmine": "^0.5.2",
