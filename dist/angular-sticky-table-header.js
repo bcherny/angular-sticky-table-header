@@ -56,6 +56,7 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
           tr: element.find('tr')[0],
           clone: null,
           windowEvents: {},
+          oldScroll: 0,
           createClone: function () {
             return angular.element(scope.tr).clone(true, true).addClass(options.cloneClassName).appendTo(element.find('thead'));
           },
@@ -109,9 +110,11 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
               scope.setStuck(true);
             } else if (scope.stuck && scrollY < scope.offset.top) {
               scope.setStuck(false);
-            }
-            if (scrollX) {
-              scope.clone.css('left', scope.offset.left - scrollX);
+            } else if (scrollX) {
+              var diff = element.scrollLeft() - scope.oldScroll;
+              scope.oldScroll = element.scrollLeft();
+              var oldLeft = parseInt(angular.element(scope.clone).css('left'));
+              scope.clone.css('left', oldLeft - diff);
             }
           }),
           observeTr: function () {

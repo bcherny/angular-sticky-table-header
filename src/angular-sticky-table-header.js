@@ -51,6 +51,8 @@ angular
 				// $window, so they can be safely removed
 				windowEvents: {},
 
+				oldScroll: 0,
+
 				createClone: function () {
 
 					return angular
@@ -145,10 +147,11 @@ angular
 						scope.setStuck(true);
 					} else if (scope.stuck && scrollY < scope.offset.top) {
 						scope.setStuck(false);
-					}
-
-					if (scrollX) {
-						scope.clone.css('left', scope.offset.left - scrollX);
+					} else if (scrollX) {
+						var diff = element.scrollLeft() - scope.oldScroll;
+		              	scope.oldScroll = element.scrollLeft() ;
+		              	var oldLeft = parseInt(angular.element(scope.clone).css('left'))
+		              	scope.clone.css('left', oldLeft - diff);
 					}
 
 				}),
