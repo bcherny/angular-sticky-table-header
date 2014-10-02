@@ -1,6 +1,7 @@
 module.exports = (grunt) ->
 
 	[
+		'grunt-autoprefixer'
 		'grunt-contrib-coffee'
 		'grunt-contrib-concat'
 		'grunt-contrib-jasmine'
@@ -12,13 +13,25 @@ module.exports = (grunt) ->
 	.forEach grunt.loadNpmTasks
 
 	# task sets
-	build = ['ngmin', 'concat', 'sass']
+	build = ['ngmin', 'concat', 'sass', 'autoprefixer']
 	test = ['coffee', 'jasmine:unit']
 
 	# task defs
 	grunt.initConfig
 
 		pkg: grunt.file.readJSON 'package.json'
+
+		autoprefixer:
+			options:
+				browsers: [
+					'Explorer >= 11'
+					'last 5 Chrome versions'
+					'last 5 Firefox versions'
+				]
+				cascade: true
+			main:
+				src: 'dist/<%= pkg.name %>.css'
+				dest: 'dist/<%= pkg.name %>.css'
 
 		coffee:
 			files:
