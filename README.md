@@ -1,4 +1,4 @@
-angular-sticky-table-header [![Build Status](https://travis-ci.org/turn/angular-sticky-table-header.svg?branch=master)](https://travis-ci.org/turn/angular-sticky-table-header) [![Coverage Status](https://img.shields.io/coveralls/turn/angular-sticky-table-header.svg)](https://coveralls.io/r/turn/angular-sticky-table-header)
+angular-sticky-table-header [![Build Status](https://travis-ci.org/bcherny/angular-sticky-table-header.svg?branch=master)](https://travis-ci.org/bcherny/angular-sticky-table-header) [![Coverage Status](https://img.shields.io/coveralls/bcherny/angular-sticky-table-header.svg)](https://coveralls.io/r/bcherny/angular-sticky-table-header)
 ===========================
 
 ### dependencies
