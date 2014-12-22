@@ -164,7 +164,7 @@ describe('angular-sticky-table-header', function() {
       this.scope.setStuck(true);
       return expect(this.scope.stuck).toBe(true);
     });
-    return it('should coerce non-boolean values into booleans', function() {
+    it('should coerce non-boolean values into booleans', function() {
       this.scope.setStuck(true);
       expect(this.scope.stuck).toBe(true);
       this.scope.setStuck('foo');
@@ -178,6 +178,11 @@ describe('angular-sticky-table-header', function() {
       this.scope.setStuck(false);
       return expect(this.scope.stuck).toBe(false);
     });
+    return it('should call #toggleClone when scope.stuck changes', inject(function($timeout) {
+      spyOn(this.scope, 'toggleClone');
+      this.scope.setStuck(true);
+      return expect(this.scope.toggleClone).toHaveBeenCalled();
+    }));
   });
   describe('#toggleClone', function() {
     it('should toggle options.stuckClassName on the clone', function() {
@@ -510,20 +515,12 @@ describe('angular-sticky-table-header', function() {
         return expect(this.scope.changeDisabled).toHaveBeenCalled();
       });
     }));
-    it('should call #rowsChanged when scope.rows changes', inject(function($timeout) {
+    return it('should call #rowsChanged when scope.rows changes', inject(function($timeout) {
       spyOn(this.scope, 'rowsChanged');
       this.element.attr('rows', 'foo');
       this.scope.$apply();
       return $timeout(function() {
         return expect(this.scope.rowsChanged).toHaveBeenCalled();
-      });
-    }));
-    return it('should call #toggleClone when scope.stuck changes', inject(function($timeout) {
-      spyOn(this.scope, 'toggleClone');
-      this.element.attr('stuck', 'foo');
-      this.scope.$apply();
-      return $timeout(function() {
-        return expect(this.scope.toggleClone).toHaveBeenCalled();
       });
     }));
   });
