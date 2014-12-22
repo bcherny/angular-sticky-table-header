@@ -277,6 +277,15 @@ describe 'angular-sticky-table-header', ->
 			expect @scope.stuck
 			.toBe false
 
+		it 'should call #toggleClone', ->
+
+			spyOn @scope, 'toggleClone'
+
+			@scope.setStuck true
+
+			expect @scope.toggleClone
+			.not.toHaveBeenCalled()
+
 
 	describe '#toggleClone', ->
 
@@ -718,16 +727,4 @@ describe 'angular-sticky-table-header', ->
 
 			$timeout ->
 				expect @scope.rowsChanged
-				.toHaveBeenCalled()
-
-		it 'should call #toggleClone when scope.stuck changes', inject ($timeout) ->
-
-			spyOn @scope, 'toggleClone'
-
-			@element.attr 'stuck', 'foo'
-
-			do @scope.$apply
-
-			$timeout ->
-				expect @scope.toggleClone
 				.toHaveBeenCalled()
