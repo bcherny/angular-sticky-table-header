@@ -1,5 +1,9 @@
-angular-sticky-table-header [![Build Status](https://travis-ci.org/bcherny/angular-sticky-table-header.svg?branch=master)](https://travis-ci.org/bcherny/angular-sticky-table-header) [![Coverage Status](https://img.shields.io/coveralls/bcherny/angular-sticky-table-header.svg)](https://coveralls.io/r/bcherny/angular-sticky-table-header)
-===========================
+# angular-sticky-table-header [![Build Status][build]](https://travis-ci.org/bcherny/angular-sticky-table-header) [![Coverage Status][coverage]](https://coveralls.io/r/bcherny/angular-sticky-table-header) ![][bower] [![npm]](https://www.npmjs.com/package/angular-sticky-table-header)
+
+[build]: https://img.shields.io/travis/bcherny/angular-sticky-table-header.svg?branch=master&style=flat-square
+[coverage]: http://img.shields.io/coveralls/bcherny/angular-sticky-table-header.svg?branch=master&style=flat-square
+[bower]: https://img.shields.io/bower/v/angular-sticky-table-header.svg?style=flat-square
+[npm]: https://img.shields.io/npm/v/angular-sticky-table-header.svg?style=flat-square
 
 ### dependencies
 
