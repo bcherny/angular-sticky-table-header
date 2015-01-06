@@ -89,9 +89,8 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
             };
           },
           setStuck: function (bool) {
-            scope.$apply(function () {
-              scope.stuck = !!bool;
-            });
+            scope.stuck = !!bool;
+            scope.toggleClone(bool);
           },
           toggleClone: ifClone(function (bool) {
             scope.clone[(!!bool ? 'add' : 'remove') + 'Class'](options.stuckClassName);
@@ -164,8 +163,6 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
         scope.$watch('disabled', scope.changeDisabled);
         // watch rows, and re-measure column widths when they change
         scope.$watch('rows', scope.rowsChanged);
-        // fired when stuck state changes
-        scope.$watch('stuck', scope.toggleClone);
         // teardown
         scope.$on('$destroy', scope.off);
         // init
