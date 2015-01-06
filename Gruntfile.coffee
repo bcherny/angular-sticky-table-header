@@ -34,8 +34,9 @@ module.exports = (grunt) ->
 				dest: 'dist/<%= pkg.name %>.css'
 
 		coffee:
-			files:
-				'test/test.js': 'test/test.coffee'
+			test: 
+				files:
+					'test/test.js': 'test/test.coffee'
 
 		concat:
 			main:
