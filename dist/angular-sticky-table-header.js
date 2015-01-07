@@ -109,9 +109,7 @@ angular.module('turn/stickyTableHeader', ['watchDom']).value('stickyTableHeaderO
             } else if (scope.stuck && scrollY < scope.offset.top) {
               scope.setStuck(false);
             }
-            if (scrollX) {
-              scope.clone.css('left', scope.offset.left - scrollX);
-            }
+            scope.clone.css('left', scope.offset.left - scrollX);
           }),
           observeTr: function () {
             scope.mutationObserver = watchDom.$watch(scope.tr, _.throttle(scope.resetClone, options.observeHeaderInterval), { subtree: true });

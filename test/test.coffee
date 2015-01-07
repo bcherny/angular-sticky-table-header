@@ -381,7 +381,7 @@ describe 'angular-sticky-table-header', ->
 				spyOn @element, 'scrollTop'
 				.andReturn data.elementScrollY
 
-				@scope.clone = true
+				@scope.clone = css: ->
 				@scope.stuck = false
 				@scope.offset = top: 0
 				$window.scrollY = data.windowScrollY
@@ -405,7 +405,7 @@ describe 'angular-sticky-table-header', ->
 				spyOn @element, 'scrollTop'
 				.andReturn data.elementScrollY
 
-				@scope.clone = true
+				@scope.clone = css: ->
 				@scope.stuck = true
 				@scope.offset = top: 1
 				$window.scrollY = data.windowScrollY
@@ -418,7 +418,7 @@ describe 'angular-sticky-table-header', ->
 		it 'should not call #setStuck otherwise', ->
 
 			# stuck = true, scrollY >= offset
-			@scope.clone = true
+			@scope.clone = css: ->
 			@scope.stuck = true
 			@scope.offset = top: 0
 			$window.scrollY = 1
@@ -436,7 +436,16 @@ describe 'angular-sticky-table-header', ->
 			.not.toHaveBeenCalled
 
 
-	# TODO: add tests for `if (scrollX) { ... }`
+		it 'should set left', ->
+
+			@scope.clone = css: ->
+			spyOn @scope.clone, 'css'
+
+			do @scope.checkScroll
+
+			expect @scope.clone.css
+			.toHaveBeenCalledWith 'left', jasmine.any(Number)
+
 
 
 	describe '#rowsChanged', ->
