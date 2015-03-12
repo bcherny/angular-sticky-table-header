@@ -185,12 +185,11 @@ describe 'angular-sticky-table-header', ->
 
 	describe '#setCloneGutter', ->
 
-		it 'should set the <th> clone\'s left and width CSS equal to scope.offset', ->
+		it 'should set the <th> clone\'s width CSS equal to scope.offset', ->
 
 			@scope.clone =
 				css: ->
 			@scope.offset =
-				left: 1
 				width: 2
 
 			spyOn @scope.clone, 'css'
@@ -436,7 +435,7 @@ describe 'angular-sticky-table-header', ->
 			.not.toHaveBeenCalled
 
 
-		it 'should set left', ->
+		it 'should not set left', ->
 
 			@scope.clone = css: ->
 			spyOn @scope.clone, 'css'
@@ -444,8 +443,17 @@ describe 'angular-sticky-table-header', ->
 			do @scope.checkScroll
 
 			expect @scope.clone.css
-			.toHaveBeenCalledWith 'left', jasmine.any(Number)
+			.not.toHaveBeenCalledWith 'left', jasmine.any(Number)
 
+		it 'should set top', ->
+
+			@scope.clone = css: ->
+			spyOn @scope.clone, 'css'
+
+			do @scope.checkScroll
+
+			expect @scope.clone.css
+			.toHaveBeenCalledWith 'top', jasmine.any(Number)
 
 
 	describe '#rowsChanged', ->
