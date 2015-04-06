@@ -435,16 +435,6 @@ describe 'angular-sticky-table-header', ->
 			.not.toHaveBeenCalled
 
 
-		it 'should not set left', ->
-
-			@scope.clone = css: ->
-			spyOn @scope.clone, 'css'
-
-			do @scope.checkScroll
-
-			expect @scope.clone.css
-			.not.toHaveBeenCalledWith 'left', jasmine.any(Number)
-
 		it 'should set top', ->
 
 			@scope.clone = css: ->
